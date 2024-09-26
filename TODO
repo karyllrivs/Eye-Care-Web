@@ -1,0 +1,25 @@
+1. reports on all management - pdf
+   - inventory [DONE]
+   - staff [DONE]
+   - lens [DONE]
+   - analytics [DONE]
+   - patient [DONE]
+   - order [DONE]
+   - consultation [DONE]
+   - account [DONE]
+   - staff [DONE]
+2. filter for all management (daily, weekly, monthly, quarterly, annually)
+   - patient [DONE]
+   - lens [DONE]
+   - order [DONE]
+   - inventory [DONE]
+   - consultation [DONE]
+   - account [DONE]
+   - staff [DONE]
+3. sign in with google option (web & mobile)
+   - web [DONE]
+   - mobile [DONE]
+4. client side web responsiveness (100% zoom)
+   - all [DONE]
+5. camera permission on mobile for vto
+   - mobile [DONE]

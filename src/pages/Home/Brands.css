@@ -1,0 +1,10 @@
+.brands-container {
+  display: flex;
+  overflow-x: hidden;
+  transition: transform 0.5s ease;
+}
+
+.brand {
+  flex: 0 0 auto;
+  width: 12.5%; /* Assuming 8 brands visible at a time */
+}
