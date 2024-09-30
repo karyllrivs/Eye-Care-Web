@@ -3,8 +3,7 @@ import { getFile } from "../../../utils/serverFileUtils";
 
 const OrderModal = ({ handleCloseModal, isModalVisible, selectedOrders }) => {
 
-    if (!isModalVisible)
-        return null;
+    if (!isModalVisible) return null;
 
     const updateOrderStatus = (id, status) => {
         axiosClient
@@ -13,16 +12,10 @@ const OrderModal = ({ handleCloseModal, isModalVisible, selectedOrders }) => {
                 alert(message);
                 window.location.reload();
             })
-            .catch(
-                ({
-                    response: {
-                        data: { message },
-                    },
-                }) => {
-                    console.log(message);
-                }
-            );
-    }
+            .catch(({ response: { data: { message } } }) => {
+                console.log(message);
+            });
+    };
 
     const deleteOrder = (id) => {
         if (confirm("Are you sure you want to delete this order?"))
@@ -32,16 +25,10 @@ const OrderModal = ({ handleCloseModal, isModalVisible, selectedOrders }) => {
                     alert(message);
                     window.location.reload();
                 })
-                .catch(
-                    ({
-                        response: {
-                            data: { message },
-                        },
-                    }) => {
-                        console.log(message);
-                    }
-                );
-    }
+                .catch(({ response: { data: { message } } }) => {
+                    console.log(message);
+                });
+    };
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
@@ -50,32 +37,30 @@ const OrderModal = ({ handleCloseModal, isModalVisible, selectedOrders }) => {
                 <table className="w-full text-sm text-left rtl:text-right text-gray-900 dark:text-gray-900">
                     <thead className="bg-gray-200">
                         <tr>
-                            <th scope="col" className="px-6 py-3">
-                                Product
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Quantity
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Total Amount
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Status
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Action
-                            </th>
+                            <th scope="col" className="px-6 py-3">Product</th>
+                            <th scope="col" className="px-6 py-3">Quantity</th>
+                            <th scope="col" className="px-6 py-3">Total Amount</th>
+                            <th scope="col" className="px-6 py-3">Status</th>
+                            <th scope="col" className="px-6 py-3">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         {selectedOrders.map(({ _id, product, quantity, total, status }) => (
-                            <tr key={_id} className="bg-white  dark:border-gray-700">
-                                <td className="px-6 py-4"><img className="h-24" src={getFile(product.image)} alt="" /> <span className="font-bold">{product.name}</span></td>
+                            <tr key={_id} className="bg-white dark:border-gray-700">
+                                <td className="px-6 py-4">
+                                    {/* Check if product and product.image exist before rendering */}
+                                    {product && product.image ? (
+                                        <img className="h-24" src={getFile(product.image)} alt={product.name || 'Product Image'} />
+                                    ) : (
+                                        <span>No image available</span>
+                                    )}
+                                    <span className="font-bold">{product ? product.name : 'Unknown Product'}</span>
+                                </td>
                                 <td className="px-6 py-4">{quantity}</td>
                                 <td className="px-6 py-4">₱{total}</td>
                                 <td className="px-6 py-4">{status}</td>
                                 <td className="px-6 py-4">
-                                    {status == "Pending" ?
+                                    {status === "Pending" ? (
                                         <>
                                             <button
                                                 className="mr-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full"
@@ -90,20 +75,21 @@ const OrderModal = ({ handleCloseModal, isModalVisible, selectedOrders }) => {
                                                 Cancel
                                             </button>
                                         </>
-                                        : status == "Confirmed" ?
-                                            <button
-                                                className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full"
-                                                onClick={() => updateOrderStatus(_id, "Delivered")}
-                                            >
-                                                Delivered
-                                            </button>
-                                            : <button
-                                                className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full"
-                                                onClick={() => deleteOrder(_id)}
-                                            >
-                                                Delete
-                                            </button>
-                                    }
+                                    ) : status === "Confirmed" ? (
+                                        <button
+                                            className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full"
+                                            onClick={() => updateOrderStatus(_id, "Delivered")}
+                                        >
+                                            Delivered
+                                        </button>
+                                    ) : (
+                                        <button
+                                            className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full"
+                                            onClick={() => deleteOrder(_id)}
+                                        >
+                                            Delete
+                                        </button>
+                                    )}
                                 </td>
                             </tr>
                         ))}
@@ -120,7 +106,7 @@ const OrderModal = ({ handleCloseModal, isModalVisible, selectedOrders }) => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default OrderModal
+export default OrderModal;
