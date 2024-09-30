@@ -22,7 +22,7 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
         if (selectedPatient._id)
             setFormFields(selectedPatient);
         else
-            setFormFields(emptyFields);
+            setFormFields(emptyFields)
     }, [selectedPatient]);
 
     const handleChange = (e) => {
@@ -32,16 +32,20 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
             ...formFields,
             [name]: value,
         });
-    }
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Check if the birthday field is empty
-        if (!formFields.birthday) {
-            setError("Birthday is required.");
+        // Validate required fields
+        const { name, email, mobile, address, age, birthday, gender } = formFields;
+        if (!name || !email || !mobile || !address || !age || !birthday || !gender) {
+            setError("All fields are required.");
             return;
         }
+
+        // Clear error if validation passes
+        setError("");
 
         if (formFields._id) {
             axiosClient
@@ -81,17 +85,28 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
 
     if (!isModalVisible) return null;
 
-    const { _id, name, email, mobile, address, age, birthday, gender } = formFields;
+    const {
+        _id,
+        name,
+        email,
+        mobile,
+        address,
+        age,
+        birthday,
+        gender
+    } = formFields;
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
             <form className="bg-white p-8 rounded-lg w-1/2 max-h-[90vh] overflow-y-auto" onSubmit={handleSubmit}>
                 <h2 className="text-lg font-semibold mb-4">{_id ? "Edit" : "Add"} patient:</h2>
                 <div className="space-y-4">
-                    {error && <p className="text-red-500 text-sm">{error}</p>}
+                    {error && <p className="text-red-500 text-sm">{error}</p>} {/* Error message display */}
                     <div className="flex space-x-4">
                         <div className="flex-1">
-                            <label className="block text-sm font-semibold text-gray-700">Name</label>
+                            <label className="block text-sm font-semibold text-gray-700">
+                                Name
+                            </label>
                             <input
                                 type="text"
                                 name="name"
@@ -101,7 +116,9 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
                             />
                         </div>
                         <div className="flex-1">
-                            <label className="block text-sm font-semibold text-gray-700">Email</label>
+                            <label className="block text-sm font-semibold text-gray-700">
+                                Email
+                            </label>
                             <input
                                 type="email"
                                 name="email"
@@ -111,7 +128,9 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
                             />
                         </div>
                         <div className="flex-1">
-                            <label className="block text-sm font-semibold text-gray-700">Mobile</label>
+                            <label className="block text-sm font-semibold text-gray-700">
+                                Mobile
+                            </label>
                             <input
                                 type="text"
                                 name="mobile"
@@ -123,7 +142,9 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
                     </div>
                     <div className="flex space-x-4">
                         <div className="flex-1">
-                            <label className="block text-sm font-semibold text-gray-700">Birthday</label>
+                            <label className="block text-sm font-semibold text-gray-700">
+                                Birthday
+                            </label>
                             <input
                                 type="date"
                                 name="birthday"
@@ -133,7 +154,9 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
                             />
                         </div>
                         <div className="flex-1">
-                            <label className="block text-sm font-semibold text-gray-700">Age</label>
+                            <label className="block text-sm font-semibold text-gray-700">
+                                Age
+                            </label>
                             <input
                                 type="number"
                                 name="age"
@@ -143,7 +166,9 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
                             />
                         </div>
                         <div className="flex-1">
-                            <label className="block text-sm font-semibold text-gray-700">Gender</label>
+                            <label className="block text-sm font-semibold text-gray-700">
+                                Gender
+                            </label>
                             <input
                                 type="text"
                                 name="gender"
@@ -155,7 +180,9 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
                     </div>
                     <div className="flex space-x-4">
                         <div className="flex-1">
-                            <label className="block text-sm font-semibold text-gray-700">Address</label>
+                            <label className="block text-sm font-semibold text-gray-700">
+                                Address
+                            </label>
                             <input
                                 type="text"
                                 name="address"
@@ -167,18 +194,21 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
                     </div>
                 </div>
                 <div className="mt-6 flex justify-end">
-                    <button type="submit" className="text-white bg-green-500 hover:bg-green-600 px-9 py-2 rounded">
+                    <button
+                        type="submit"
+                        className="text-white bg-green-500 hover:bg-green-600 px-9 py-2 rounded"
+                    >
                         Save
                     </button>
-                    {_id && (
+                    {selectedPatient._id ?
                         <button
                             type="button"
-                            onClick={() => deletePatient(_id)}
+                            onClick={() => deletePatient(selectedPatient._id)}
                             className="text-white bg-red-500 hover:bg-red-600 px-9 py-2 rounded ml-2"
                         >
                             Delete
-                        </button>
-                    )}
+                        </button> : null
+                    }
                     <button
                         type="button"
                         className="text-white bg-blue-500 hover:bg-blue-600 px-9 py-2 rounded ml-2"
