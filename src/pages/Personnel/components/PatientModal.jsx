@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import axiosClient from "../../../utils/axiosClient";
 import { convertDate, formatDate } from "../../../utils/formatter";
 
-
 const emptyFields = {
     _id: "",
     name: "",
@@ -23,8 +22,8 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
         if (selectedPatient._id)
             setFormFields(selectedPatient);
         else
-            setFormFields(emptyFields)
-    }, [selectedPatient])
+            setFormFields(emptyFields);
+    }, [selectedPatient]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -37,42 +36,35 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(formFields);
 
-        if (formFields._id)
+        // Check if the birthday field is empty
+        if (!formFields.birthday) {
+            setError("Birthday is required.");
+            return;
+        }
+
+        if (formFields._id) {
             axiosClient
-                .put("/patients/" + selectedPatient._id, { ...formFields, birthday: formatDate(birthday), })
+                .put("/patients/" + selectedPatient._id, { ...formFields, birthday: formatDate(formFields.birthday) })
                 .then(({ data: { message } }) => {
                     alert(message);
                     window.location.reload();
                 })
-                .catch(
-                    ({
-                        response: {
-                            data: { message },
-                        },
-                    }) => {
-                        setError(message);
-                    }
-                );
-
-        else
+                .catch(({ response: { data: { message } } }) => {
+                    setError(message);
+                });
+        } else {
             axiosClient
-                .post("/patients", { ...formFields, birthday: formatDate(birthday), })
+                .post("/patients", { ...formFields, birthday: formatDate(formFields.birthday) })
                 .then(({ data: { message } }) => {
                     alert(message);
                     window.location.reload();
                 })
-                .catch(
-                    ({
-                        response: {
-                            data: { message },
-                        },
-                    }) => {
-                        setError(message);
-                    }
-                );
-    }
+                .catch(({ response: { data: { message } } }) => {
+                    setError(message);
+                });
+        }
+    };
 
     const deletePatient = (id) => {
         if (confirm("Are you sure you want to delete this patient?"))
@@ -82,32 +74,14 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
                     alert(message);
                     window.location.reload();
                 })
-                .catch(
-                    ({
-                        response: {
-                            data: { message },
-                        },
-                    }) => {
-                        console.log(message);
-                    }
-                );
-    }
+                .catch(({ response: { data: { message } } }) => {
+                    console.log(message);
+                });
+    };
 
-    if (!isModalVisible)
-        return null;
+    if (!isModalVisible) return null;
 
-
-
-    const {
-        _id,
-        name,
-        email,
-        mobile,
-        address,
-        age,
-        birthday,
-        gender
-    } = formFields;
+    const { _id, name, email, mobile, address, age, birthday, gender } = formFields;
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
@@ -117,9 +91,7 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
                     {error && <p className="text-red-500 text-sm">{error}</p>}
                     <div className="flex space-x-4">
                         <div className="flex-1">
-                            <label className="block text-sm font-semibold text-gray-700">
-                                Name
-                            </label>
+                            <label className="block text-sm font-semibold text-gray-700">Name</label>
                             <input
                                 type="text"
                                 name="name"
@@ -129,9 +101,7 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
                             />
                         </div>
                         <div className="flex-1">
-                            <label className="block text-sm font-semibold text-gray-700">
-                                Email
-                            </label>
+                            <label className="block text-sm font-semibold text-gray-700">Email</label>
                             <input
                                 type="email"
                                 name="email"
@@ -141,9 +111,7 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
                             />
                         </div>
                         <div className="flex-1">
-                            <label className="block text-sm font-semibold text-gray-700">
-                                Mobile
-                            </label>
+                            <label className="block text-sm font-semibold text-gray-700">Mobile</label>
                             <input
                                 type="text"
                                 name="mobile"
@@ -155,9 +123,7 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
                     </div>
                     <div className="flex space-x-4">
                         <div className="flex-1">
-                            <label className="block text-sm font-semibold text-gray-700">
-                                Birthday
-                            </label>
+                            <label className="block text-sm font-semibold text-gray-700">Birthday</label>
                             <input
                                 type="date"
                                 name="birthday"
@@ -167,9 +133,7 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
                             />
                         </div>
                         <div className="flex-1">
-                            <label className="block text-sm font-semibold text-gray-700">
-                                Age
-                            </label>
+                            <label className="block text-sm font-semibold text-gray-700">Age</label>
                             <input
                                 type="number"
                                 name="age"
@@ -179,9 +143,7 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
                             />
                         </div>
                         <div className="flex-1">
-                            <label className="block text-sm font-semibold text-gray-700">
-                                Gender
-                            </label>
+                            <label className="block text-sm font-semibold text-gray-700">Gender</label>
                             <input
                                 type="text"
                                 name="gender"
@@ -193,9 +155,7 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
                     </div>
                     <div className="flex space-x-4">
                         <div className="flex-1">
-                            <label className="block text-sm font-semibold text-gray-700">
-                                Address
-                            </label>
+                            <label className="block text-sm font-semibold text-gray-700">Address</label>
                             <input
                                 type="text"
                                 name="address"
@@ -207,21 +167,18 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
                     </div>
                 </div>
                 <div className="mt-6 flex justify-end">
-                    <button
-                        type="submit"
-                        className="text-white bg-green-500 hover:bg-green-600 px-9 py-2 rounded"
-                    >
+                    <button type="submit" className="text-white bg-green-500 hover:bg-green-600 px-9 py-2 rounded">
                         Save
                     </button>
-                    {selectedPatient._id ?
+                    {_id && (
                         <button
                             type="button"
-                            onClick={() => deletePatient(selectedPatient._id)}
+                            onClick={() => deletePatient(_id)}
                             className="text-white bg-red-500 hover:bg-red-600 px-9 py-2 rounded ml-2"
                         >
                             Delete
-                        </button> : null
-                    }
+                        </button>
+                    )}
                     <button
                         type="button"
                         className="text-white bg-blue-500 hover:bg-blue-600 px-9 py-2 rounded ml-2"
