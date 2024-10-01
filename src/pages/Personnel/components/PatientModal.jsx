@@ -25,12 +25,39 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
             setFormFields(emptyFields);
     }, [selectedPatient]);
 
+    // Helper function to calculate age from birthday
+    const calculateAge = (birthday) => {
+        const birthDate = new Date(birthday);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        const dayDiff = today.getDate() - birthDate.getDate();
+
+        // Adjust the age if the birthday hasn't occurred yet this year
+        if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+            age--;
+        }
+
+        return age;
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormFields({
-            ...formFields,
-            [name]: value,
-        });
+
+        // If the birthday field is changed, calculate and update the age
+        if (name === "birthday") {
+            const age = calculateAge(value);
+            setFormFields({
+                ...formFields,
+                [name]: value,
+                age: age // Automatically update the age field
+            });
+        } else {
+            setFormFields({
+                ...formFields,
+                [name]: value,
+            });
+        }
     };
 
     const handleSubmit = (e) => {
@@ -41,6 +68,12 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
         // Validate required fields
         if (!name || !email || !mobile || !address || !age || !birthday || !gender) {
             setError("All fields are required.");
+            return;
+        }
+
+        // Validate mobile length
+        if (mobile.length !== 11) {
+            setError("Mobile number must be 11 digits.");
             return;
         }
 
@@ -141,11 +174,14 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
                                 Mobile
                             </label>
                             <input
-                                type="text"
+                                type="tel"
                                 name="mobile"
                                 value={mobile}
                                 onChange={handleChange}
+                                pattern="\d{11}" // Allows only 11 digits
+                                maxLength="11" // Limit to 11 digits
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
+                                placeholder="Enter 11-digit mobile number"
                             />
                         </div>
                     </div>
@@ -170,7 +206,7 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
                                 type="number"
                                 name="age"
                                 value={age}
-                                onChange={handleChange}
+                                readOnly // Make the age field read-only as it's calculated automatically
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
                             />
                         </div>
