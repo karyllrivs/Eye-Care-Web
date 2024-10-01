@@ -1,9 +1,7 @@
 import React from "react";
 import Logo from "../assets/Logo2.png";
 import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaClock } from "react-icons/fa";
-import appStore from "../assets/appstore.png";
 import googleStore from "../assets/googlestore.png";
-import gcash from "../assets/gcash.png";
 import BackgroundImage from "../assets/background.png";
 
 const Footer = () => {

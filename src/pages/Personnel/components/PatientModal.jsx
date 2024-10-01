@@ -22,12 +22,11 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
         if (selectedPatient._id)
             setFormFields(selectedPatient);
         else
-            setFormFields(emptyFields)
+            setFormFields(emptyFields);
     }, [selectedPatient]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-
         setFormFields({
             ...formFields,
             [name]: value,
@@ -37,8 +36,9 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Validate required fields
         const { name, email, mobile, address, age, birthday, gender } = formFields;
+
+        // Validate required fields
         if (!name || !email || !mobile || !address || !age || !birthday || !gender) {
             setError("All fields are required.");
             return;
@@ -47,9 +47,14 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
         // Clear error if validation passes
         setError("");
 
+        // If email is empty, set it to "NA"
+        const finalEmail = email === "" ? "NA" : email;
+
+        const formData = { ...formFields, email: finalEmail, birthday: formatDate(birthday) };
+
         if (formFields._id) {
             axiosClient
-                .put("/patients/" + selectedPatient._id, { ...formFields, birthday: formatDate(formFields.birthday) })
+                .put("/patients/" + selectedPatient._id, formData)
                 .then(({ data: { message } }) => {
                     alert(message);
                     window.location.reload();
@@ -59,7 +64,7 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
                 });
         } else {
             axiosClient
-                .post("/patients", { ...formFields, birthday: formatDate(formFields.birthday) })
+                .post("/patients", formData)
                 .then(({ data: { message } }) => {
                     alert(message);
                     window.location.reload();
@@ -120,12 +125,16 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
                                 Email
                             </label>
                             <input
-                                type="email"
+                                type="text"
                                 name="email"
                                 value={email}
                                 onChange={handleChange}
+                                placeholder="Enter email or 'NA' if not available"
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
                             />
+                            <small className="text-gray-500">
+                                If email is not available, type "NA".
+                            </small>
                         </div>
                         <div className="flex-1">
                             <label className="block text-sm font-semibold text-gray-700">
@@ -200,15 +209,15 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
                     >
                         Save
                     </button>
-                    {selectedPatient._id ?
+                    {_id ? (
                         <button
                             type="button"
-                            onClick={() => deletePatient(selectedPatient._id)}
+                            onClick={() => deletePatient(_id)}
                             className="text-white bg-red-500 hover:bg-red-600 px-9 py-2 rounded ml-2"
                         >
                             Delete
-                        </button> : null
-                    }
+                        </button>
+                    ) : null}
                     <button
                         type="button"
                         className="text-white bg-blue-500 hover:bg-blue-600 px-9 py-2 rounded ml-2"
