@@ -3,7 +3,6 @@ import axiosClient from "../../../utils/axiosClient";
 import { getFile } from "../../../utils/serverFileUtils";
 import { convertDate, formatDate } from "../../../utils/formatter";
 
-
 const defaultFields = {
     _id: "",
     username: "",
@@ -24,18 +23,73 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
 
     const [formFields, setFormFields] = useState(defaultFields);
     const [error, setError] = useState("");
+    const [passwordError, setPasswordError] = useState(""); // State for password error
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false); // State for password visibility
 
     useMemo(() => {
         if (selectedAccount._id)
             setFormFields({ password: "", ...selectedAccount });
         else
             setFormFields(defaultFields)
-    }, [selectedAccount])
+    }, [selectedAccount]);
+
+    const calculateAge = (birthday) => {
+        const today = new Date();
+        const birthDate = new Date(birthday);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDifference = today.getMonth() - birthDate.getMonth();
+
+        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age;
+    };
+
+    const validatePassword = (password) => {
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        return passwordRegex.test(password);
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        if (name == "username" || name == "password" || name == "role") {
+        if (name === "mobile") {
+            const regex = /^[0-9]*$/; // Allow only numbers
+            if (value.length <= 11 && regex.test(value)) {
+                setFormFields({
+                    ...formFields,
+                    profile: {
+                        ...formFields.profile,
+                        [name]: value,
+                    }
+                });
+            }
+            return;
+        }
+
+        if (name === "birthday") {
+            const age = calculateAge(value);
+            setFormFields({
+                ...formFields,
+                profile: {
+                    ...formFields.profile,
+                    [name]: value,
+                    age: age,
+                }
+            });
+            return;
+        }
+
+        // Validate password input
+        if (name === "password") {
+            if (!validatePassword(value)) {
+                setPasswordError("Password must be at least 8 characters long and include uppercase letters, lowercase letters, numbers, and symbols.");
+            } else {
+                setPasswordError(""); // Clear error if password is valid
+            }
+        }
+
+        if (name === "username" || name === "role") {
             setFormFields({
                 ...formFields,
                 [name]: value,
@@ -50,14 +104,20 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                 [name]: value,
             }
         });
-    }
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if (formFields._id)
+        // Check if there are any password errors before submission
+        if (passwordError) {
+            alert(passwordError);
+            return;
+        }
+
+        if (formFields._id) {
             axiosClient
-                .put("/personnel/" + selectedAccount._id, { ...formFields, profile: { ...formFields.profile, birthday: formatDate(birthday) } }, {
+                .put("/personnel/" + selectedAccount._id, { ...formFields, profile: { ...formFields.profile, birthday: formatDate(formFields.profile.birthday) } }, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
@@ -67,7 +127,7 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                     window.location.reload();
                 })
                 .catch(
-                    ({
+                    ( {
                         response: {
                             data: { message },
                         },
@@ -76,9 +136,9 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                     }
                 );
 
-        else
+        } else {
             axiosClient
-                .post("/personnel", { ...formFields, profile: { ...formFields.profile, birthday: formatDate(birthday) } }, {
+                .post("/personnel", { ...formFields, profile: { ...formFields.profile, birthday: formatDate(formFields.profile.birthday) } }, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
@@ -88,7 +148,7 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                     window.location.reload();
                 })
                 .catch(
-                    ({
+                    ( {
                         response: {
                             data: { message },
                         },
@@ -96,13 +156,13 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                         setError(message);
                     }
                 );
-    }
+        }
+    };
 
     const loadImage = (event) => {
         let reader = new FileReader();
         reader.onload = function () {
-            let output =
-                document.getElementById('ImagePreview');
+            let output = document.getElementById('ImagePreview');
             output.src = reader.result;
         };
         reader.readAsDataURL(event.target.files[0]);
@@ -110,8 +170,7 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
             ...formFields,
             image: event.target.files[0]
         });
-    }
-
+    };
 
     const deleteStaff = (id) => {
         if (confirm("Are you sure you want to delete this personnel?"))
@@ -122,7 +181,7 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                     window.location.reload();
                 })
                 .catch(
-                    ({
+                    ( {
                         response: {
                             data: { message },
                         },
@@ -130,12 +189,10 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                         console.log(message);
                     }
                 );
-    }
+    };
 
     if (!isModalVisible)
         return null;
-
-
 
     const {
         _id,
@@ -159,6 +216,7 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                 <h2 className="text-lg font-semibold mb-4">{_id ? "Edit" : "Add"} {role}:</h2>
                 <div className="space-y-4">
                     {error && <p className="text-red-500 text-sm">{error}</p>}
+                    {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>} {/* Password error message */}
                     <div className="flex space-x-4">
                         <div className="flex-1">
                             <label className="block text-sm font-semibold text-gray-700">
@@ -176,13 +234,23 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                             <label className="block text-sm font-semibold text-gray-700">
                                 Password
                             </label>
-                            <input
-                                type="password"
-                                name="password"
-                                value={password}
-                                onChange={handleChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
-                            />
+                            <div className="relative">
+                                <input
+                                    type={isPasswordVisible ? "text" : "password"} // Toggle input type
+                                    name="password"
+                                    value={password}
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setIsPasswordVisible(!isPasswordVisible)} // Toggle visibility
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                >
+                                    {isPasswordVisible ? "Hide" : "Show"} {/* Button text changes */}
+                                </button>
+                            </div>
                         </div>
                         {isSuperAdmin
                             ? <div className="flex-1">
@@ -228,8 +296,6 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
                             />
                         </div>
-                    </div>
-                    <div className="flex space-x-4">
                         <div className="flex-1">
                             <label className="block text-sm font-semibold text-gray-700">
                                 Birthday
@@ -237,11 +303,13 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                             <input
                                 type="date"
                                 name="birthday"
-                                value={convertDate(birthday)}
+                                value={birthday}
                                 onChange={handleChange}
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
                             />
                         </div>
+                    </div>
+                    <div className="flex space-x-4">
                         <div className="flex-1">
                             <label className="block text-sm font-semibold text-gray-700">
                                 Age
@@ -250,7 +318,7 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                                 type="number"
                                 name="age"
                                 value={age}
-                                onChange={handleChange}
+                                readOnly
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
                             />
                         </div>
@@ -258,16 +326,18 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                             <label className="block text-sm font-semibold text-gray-700">
                                 Gender
                             </label>
-                            <input
-                                type="text"
+                            <select
                                 name="gender"
                                 value={gender}
                                 onChange={handleChange}
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
-                            />
+                            >
+                                <option value="" disabled>Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
                         </div>
-                    </div>
-                    <div className="flex space-x-4">
                         <div className="flex-1">
                             <label className="block text-sm font-semibold text-gray-700">
                                 Address
@@ -289,7 +359,6 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                                 onChange={loadImage}
                                 accept="image/*"
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
-
                             />
                             <div className="mt-2 flex flex-wrap">
                                 <img
@@ -310,7 +379,7 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                     >
                         Save
                     </button>
-                    {selectedAccount._id ?
+                    {selectedAccount._id ? 
                         <button
                             type="button"
                             onClick={() => deleteStaff(selectedAccount._id)}

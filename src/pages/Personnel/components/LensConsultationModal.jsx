@@ -56,6 +56,7 @@ const AddOptions = <>
 </>;
 
 
+
 const LensConsultationModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => {
 
     const [formData, setFormData] = useState(defaultFields);
@@ -180,13 +181,24 @@ const LensConsultationModal = ({ handleCloseModal, isModalVisible, selectedPatie
                     <div className="col-span-2">
                         <h3 className="font-bold mb-2">Consultation Date/Time</h3>
                         <div className="grid grid-cols-2 gap-4">
-                            <input
-                                type="date"
-                                name="consultationDate"
-                                value={formData.consultationDate}
-                                onChange={handleChange}
-                                className="mb-2 p-2 w-full border rounded"
-                            />
+                        <input
+                            type="date"
+                            name="consultationDate"
+                            value={formData.consultationDate}
+                            onChange={handleChange}
+                            min={new Date().toISOString().split('T')[0]} // Disable previous dates
+                            onInput={(e) => {
+                        const selectedDate = new Date(e.target.value);
+                        const dayOfWeek = selectedDate.getDay(); // 0 is Sunday
+                            if (dayOfWeek === 0) {
+                                alert("Sunday is not available for consultations."); // Alert message added
+                                e.target.value = ""; // Clear the date input if Sunday
+                            }
+                    }}
+                        className="mb-2 p-2 w-full border rounded"
+                    />
+
+
                             <input
                                 type="time"
                                 name="consultationTime"
