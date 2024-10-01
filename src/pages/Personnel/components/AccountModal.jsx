@@ -23,15 +23,13 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
 
     const [formFields, setFormFields] = useState(defaultFields);
     const [error, setError] = useState("");
-    const [passwordError, setPasswordError] = useState(""); // State for password error
-    const [isPasswordVisible, setIsPasswordVisible] = useState(false); // State for password visibility
 
     useMemo(() => {
         if (selectedAccount._id)
             setFormFields({ password: "", ...selectedAccount });
         else
             setFormFields(defaultFields)
-    }, [selectedAccount]);
+    }, [selectedAccount])
 
     const calculateAge = (birthday) => {
         const today = new Date();
@@ -39,20 +37,17 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
         let age = today.getFullYear() - birthDate.getFullYear();
         const monthDifference = today.getMonth() - birthDate.getMonth();
 
+        // Adjust age if the birthday hasn't occurred yet this year
         if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
             age--;
         }
         return age;
     };
 
-    const validatePassword = (password) => {
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-        return passwordRegex.test(password);
-    };
-
     const handleChange = (e) => {
         const { name, value } = e.target;
 
+        // Handle mobile number validation
         if (name === "mobile") {
             const regex = /^[0-9]*$/; // Allow only numbers
             if (value.length <= 11 && regex.test(value)) {
@@ -67,6 +62,7 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
             return;
         }
 
+        // Handle birthday input and age calculation
         if (name === "birthday") {
             const age = calculateAge(value);
             setFormFields({
@@ -74,22 +70,13 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                 profile: {
                     ...formFields.profile,
                     [name]: value,
-                    age: age,
+                    age: age, // Set calculated age
                 }
             });
             return;
         }
 
-        // Validate password input
-        if (name === "password") {
-            if (!validatePassword(value)) {
-                setPasswordError("Password must be at least 8 characters long and include uppercase letters, lowercase letters, numbers, and symbols.");
-            } else {
-                setPasswordError(""); // Clear error if password is valid
-            }
-        }
-
-        if (name === "username" || name === "role") {
+        if (name === "username" || name === "password" || name === "role") {
             setFormFields({
                 ...formFields,
                 [name]: value,
@@ -109,13 +96,7 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Check if there are any password errors before submission
-        if (passwordError) {
-            alert(passwordError);
-            return;
-        }
-
-        if (formFields._id) {
+        if (formFields._id)
             axiosClient
                 .put("/personnel/" + selectedAccount._id, { ...formFields, profile: { ...formFields.profile, birthday: formatDate(formFields.profile.birthday) } }, {
                     headers: {
@@ -136,7 +117,7 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                     }
                 );
 
-        } else {
+        else
             axiosClient
                 .post("/personnel", { ...formFields, profile: { ...formFields.profile, birthday: formatDate(formFields.profile.birthday) } }, {
                     headers: {
@@ -156,7 +137,6 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                         setError(message);
                     }
                 );
-        }
     };
 
     const loadImage = (event) => {
@@ -216,7 +196,6 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                 <h2 className="text-lg font-semibold mb-4">{_id ? "Edit" : "Add"} {role}:</h2>
                 <div className="space-y-4">
                     {error && <p className="text-red-500 text-sm">{error}</p>}
-                    {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>} {/* Password error message */}
                     <div className="flex space-x-4">
                         <div className="flex-1">
                             <label className="block text-sm font-semibold text-gray-700">
@@ -234,23 +213,13 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                             <label className="block text-sm font-semibold text-gray-700">
                                 Password
                             </label>
-                            <div className="relative">
-                                <input
-                                    type={isPasswordVisible ? "text" : "password"} // Toggle input type
-                                    name="password"
-                                    value={password}
-                                    onChange={handleChange}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setIsPasswordVisible(!isPasswordVisible)} // Toggle visibility
-                                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                                >
-                                    {isPasswordVisible ? "Hide" : "Show"} {/* Button text changes */}
-                                </button>
-                            </div>
+                            <input
+                                type="password"
+                                name="password"
+                                value={password}
+                                onChange={handleChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
+                            />
                         </div>
                         {isSuperAdmin
                             ? <div className="flex-1">
@@ -289,13 +258,19 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                                 Mobile
                             </label>
                             <input
-                                type="text"
+                                type="tel"
                                 name="mobile"
                                 value={mobile}
                                 onChange={handleChange}
+                                maxLength={11}
+                                pattern="\d{11}"
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
+                                placeholder="Enter 11 digit mobile number"
+                                required
                             />
                         </div>
+                    </div>
+                    <div className="flex space-x-4">
                         <div className="flex-1">
                             <label className="block text-sm font-semibold text-gray-700">
                                 Birthday
@@ -303,13 +278,11 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                             <input
                                 type="date"
                                 name="birthday"
-                                value={birthday}
+                                value={convertDate(birthday)}
                                 onChange={handleChange}
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
                             />
                         </div>
-                    </div>
-                    <div className="flex space-x-4">
                         <div className="flex-1">
                             <label className="block text-sm font-semibold text-gray-700">
                                 Age
@@ -318,10 +291,12 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                                 type="number"
                                 name="age"
                                 value={age}
-                                readOnly
+                                readOnly // Make age read-only as it's calculated
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
                             />
                         </div>
+                    </div>
+                    <div className="flex space-x-4">
                         <div className="flex-1">
                             <label className="block text-sm font-semibold text-gray-700">
                                 Gender
