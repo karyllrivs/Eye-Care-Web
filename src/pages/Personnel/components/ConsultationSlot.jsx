@@ -64,10 +64,19 @@ const ConsultationSlot = () => {
 
         // Form validation: Check if date or time is empty
         let hasError = false;
-        if (!date) {
-            setFieldErrors((prev) => ({ ...prev, dateError: "Please select a date." }));
+
+        // Check if the selected date is a Sunday
+        const selectedDate = new Date(date);
+        if (selectedDate.getDay() === 0) { // 0 is Sunday
+            setFieldErrors((prev) => ({ ...prev, dateError: "Sundays are not available for selection." }));
             hasError = true;
+        } else {
+            if (!date) {
+                setFieldErrors((prev) => ({ ...prev, dateError: "Please select a date." }));
+                hasError = true;
+            }
         }
+
         if (!time) {
             setFieldErrors((prev) => ({ ...prev, timeError: "Please select a time slot." }));
             hasError = true;
@@ -122,9 +131,7 @@ const ConsultationSlot = () => {
                             {error && <p className="text-red-500 text-sm">{error}</p>}
                             <div className="flex space-x-4">
                                 <div className="flex-1">
-                                    <label className="block text-sm font-semibold text-gray-700">
-                                        Date
-                                    </label>
+                                    <label className="block text-sm font-semibold text-gray-700">Date</label>
                                     <input
                                         type="date"
                                         name="date"
@@ -142,9 +149,7 @@ const ConsultationSlot = () => {
                                     )}
                                 </div>
                                 <div className="flex-1">
-                                    <label className="block text-sm font-semibold text-gray-700">
-                                        Time
-                                    </label>
+                                    <label className="block text-sm font-semibold text-gray-700">Time</label>
                                     <select
                                         name="time"
                                         value={time}
@@ -185,18 +190,10 @@ const ConsultationSlot = () => {
                         <table className="w-full text-sm text-left rtl:text-right text-gray-900 dark:text-gray-900">
                             <thead className="bg-gray-200">
                                 <tr>
-                                    <th scope="col" className="px-6 py-3">
-                                        Date
-                                    </th>
-                                    <th scope="col" className="px-6 py-3">
-                                        Time
-                                    </th>
-                                    <th scope="col" className="px-6 py-3">
-                                        Status
-                                    </th>
-                                    <th scope="col" className="px-6 py-3">
-                                        Actions
-                                    </th>
+                                    <th scope="col" className="px-6 py-3">Date</th>
+                                    <th scope="col" className="px-6 py-3">Time</th>
+                                    <th scope="col" className="px-6 py-3">Status</th>
+                                    <th scope="col" className="px-6 py-3">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
