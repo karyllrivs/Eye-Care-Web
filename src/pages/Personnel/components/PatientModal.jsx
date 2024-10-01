@@ -214,13 +214,17 @@ const PatientModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => 
                             <label className="block text-sm font-semibold text-gray-700">
                                 Gender
                             </label>
-                            <input
-                                type="text"
+                            <select
                                 name="gender"
                                 value={gender}
                                 onChange={handleChange}
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
-                            />
+                            >
+                                <option value="">Select Gender</option>
+                                <option value="Female">Female</option>
+                                <option value="Male">Male</option>
+                                <option value="Other">Other</option>
+                            </select>
                         </div>
                     </div>
                     <div className="flex space-x-4">
