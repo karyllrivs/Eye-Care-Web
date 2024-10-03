@@ -19,24 +19,36 @@ const Profile = () => {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setFormFields({
-      ...formFields,
-      [name]: value,
-    });
+
+    // For mobile_number field, ensure it contains only 11-digit numbers
+    if (name === "mobile_number") {
+      // Remove non-digit characters and limit to 11 digits
+      const formattedValue = value.replace(/\D/g, "").slice(0, 11);
+
+      setFormFields({
+        ...formFields,
+        [name]: formattedValue,
+      });
+    } else {
+      setFormFields({
+        ...formFields,
+        [name]: value,
+      });
+    }
   };
 
   const loadUserImage = (event) => {
     let reader = new FileReader();
     reader.onload = function () {
-      let output = document.getElementById('profileImagePreview');
+      let output = document.getElementById("profileImagePreview");
       output.src = reader.result;
     };
     reader.readAsDataURL(event.target.files[0]);
     setFormFields({
       ...formFields,
-      image: event.target.files[0]
+      image: event.target.files[0],
     });
-  }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -60,7 +72,7 @@ const Profile = () => {
     axiosClient
       .put("/profiles/" + user_id, formFields, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       })
       .then(({ data: { message, profile } }) => {
@@ -85,7 +97,7 @@ const Profile = () => {
           alert(message);
         }
       );
-  }
+  };
 
   const handleReset = () => {
     setFormFields(profile);
@@ -113,13 +125,16 @@ const Profile = () => {
             </h1>
 
             <form onSubmit={handleSubmit}>
-
               <div className="flex flex-col md:flex-row items-center border-b-2 border-gray-300 pb-9 mb-8">
                 <div className="mb-4 md:mr-4">
                   <label htmlFor="userImage">
                     <img
                       id="profileImagePreview"
-                      src={profile.image ? getFile(profile.image) : `https://eu.ui-avatars.com/api/?name=${first_name}+${last_name}&size=250`}
+                      src={
+                        profile.image
+                          ? getFile(profile.image)
+                          : `https://eu.ui-avatars.com/api/?name=${first_name}+${last_name}&size=250`
+                      }
                       alt="Profile Icon"
                       className="rounded-full w-24 md:w-48 h-24 md:h-48 mx-auto md:mx-0"
                     />
@@ -136,9 +151,14 @@ const Profile = () => {
                   <h1 className="text-2xl font-bold text-[#384D6C] mb-2">
                     {first_name + " " + last_name}
                   </h1>
-                  {address &&
-                    <p className="text-gray-600 mb-1">Address: {address}</p>}
-                  {mobile_number && <p className="text-gray-600 mb-1">Contact: {mobile_number}</p>}
+                  {address && (
+                    <p className="text-gray-600 mb-1">Address: {address}</p>
+                  )}
+                  {mobile_number && (
+                    <p className="text-gray-600 mb-1">
+                      Contact: {mobile_number}
+                    </p>
+                  )}
                   <p className="text-gray-600">Email: {email}</p>
                 </div>
               </div>
