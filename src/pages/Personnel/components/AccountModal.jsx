@@ -23,13 +23,15 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
 
     const [formFields, setFormFields] = useState(defaultFields);
     const [error, setError] = useState("");
+    const [passwordError, setPasswordError] = useState(""); // New state for password error
+    const [showPassword, setShowPassword] = useState(false); // For password visibility toggle
 
     useMemo(() => {
         if (selectedAccount._id)
             setFormFields({ password: "", ...selectedAccount });
         else
             setFormFields(defaultFields)
-    }, [selectedAccount])
+    }, [selectedAccount]);
 
     const calculateAge = (birthday) => {
         const today = new Date();
@@ -37,19 +39,34 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
         let age = today.getFullYear() - birthDate.getFullYear();
         const monthDifference = today.getMonth() - birthDate.getMonth();
 
-        // Adjust age if the birthday hasn't occurred yet this year
         if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
             age--;
         }
         return age;
     };
 
+    const validatePasswordStrength = (password) => {
+        const minLength = 8;
+        const hasNumber = /[0-9]/.test(password);
+        const hasUpperCase = /[A-Z]/.test(password);
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+        if (password.length < minLength || !hasNumber || !hasUpperCase || !hasSpecialChar) {
+            return "Password must be at least 8 characters long, contain a number, an uppercase letter, and a special character.";
+        }
+        return "";
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        // Handle mobile number validation
+        if (name === "password") {
+            const error = validatePasswordStrength(value);
+            setPasswordError(error); // Set the password error if it's weak
+        }
+
         if (name === "mobile") {
-            const regex = /^[0-9]*$/; // Allow only numbers
+            const regex = /^[0-9]*$/;
             if (value.length <= 11 && regex.test(value)) {
                 setFormFields({
                     ...formFields,
@@ -62,7 +79,6 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
             return;
         }
 
-        // Handle birthday input and age calculation
         if (name === "birthday") {
             const age = calculateAge(value);
             setFormFields({
@@ -70,7 +86,7 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                 profile: {
                     ...formFields.profile,
                     [name]: value,
-                    age: age, // Set calculated age
+                    age: age,
                 }
             });
             return;
@@ -96,6 +112,11 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
     const handleSubmit = (e) => {
         e.preventDefault();
 
+        if (passwordError) {
+            setError("Please fix the errors before submitting.");
+            return;
+        }
+
         if (formFields._id)
             axiosClient
                 .put("/personnel/" + selectedAccount._id, { ...formFields, profile: { ...formFields.profile, birthday: formatDate(formFields.profile.birthday) } }, {
@@ -108,7 +129,7 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                     window.location.reload();
                 })
                 .catch(
-                    ( {
+                    ({
                         response: {
                             data: { message },
                         },
@@ -129,7 +150,7 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                     window.location.reload();
                 })
                 .catch(
-                    ( {
+                    ({
                         response: {
                             data: { message },
                         },
@@ -161,7 +182,7 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                     window.location.reload();
                 })
                 .catch(
-                    ( {
+                    ({
                         response: {
                             data: { message },
                         },
@@ -213,13 +234,23 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                             <label className="block text-sm font-semibold text-gray-700">
                                 Password
                             </label>
-                            <input
-                                type="password"
-                                name="password"
-                                value={password}
-                                onChange={handleChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
-                            />
+                            <div className="relative">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    name="password"
+                                    value={password}
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                                >
+                                    {showPassword ? "Hide" : "Show"}
+                                </button>
+                            </div>
+                            {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>} {/* Display password error */}
                         </div>
                         {isSuperAdmin
                             ? <div className="flex-1">
@@ -265,8 +296,6 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                                 maxLength={11}
                                 pattern="\d{11}"
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
-                                placeholder="Enter 11 digit mobile number"
-                                required
                             />
                         </div>
                     </div>
@@ -288,31 +317,15 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                                 Age
                             </label>
                             <input
-                                type="number"
+                                type="text"
                                 name="age"
                                 value={age}
-                                readOnly // Make age read-only as it's calculated
+                                disabled
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
                             />
                         </div>
                     </div>
                     <div className="flex space-x-4">
-                        <div className="flex-1">
-                            <label className="block text-sm font-semibold text-gray-700">
-                                Gender
-                            </label>
-                            <select
-                                name="gender"
-                                value={gender}
-                                onChange={handleChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
-                            >
-                                <option value="" disabled>Select Gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
                         <div className="flex-1">
                             <label className="block text-sm font-semibold text-gray-700">
                                 Address
@@ -327,23 +340,31 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                         </div>
                         <div className="flex-1">
                             <label className="block text-sm font-semibold text-gray-700">
-                                Avatar
+                                Gender
+                            </label>
+                            <select
+                                name="gender"
+                                value={gender}
+                                onChange={handleChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
+                            >
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div className="flex space-x-4">
+                        <div className="flex-1">
+                            <label className="block text-sm font-semibold text-gray-700">
+                                Profile Image
                             </label>
                             <input
                                 type="file"
-                                onChange={loadImage}
                                 accept="image/*"
+                                onChange={loadImage}
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
                             />
-                            <div className="mt-2 flex flex-wrap">
-                                <img
-                                    id="ImagePreview"
-                                    src={image ? getFile(image) : "https://via.placeholder.com/150"}
-                                    alt={name}
-                                    className="mt-2 rounded-md border border-gray-300"
-                                    style={{ maxWidth: "200px", marginRight: "10px" }}
-                                />
-                            </div>
+                            <img id="ImagePreview" alt="Profile Preview" className="mt-4 max-w-xs" src={getFile(image)} />
                         </div>
                     </div>
                 </div>
@@ -354,14 +375,15 @@ const AccountModal = ({ handleCloseModal, isModalVisible, selectedAccount, isSup
                     >
                         Save
                     </button>
-                    {selectedAccount._id ? 
-                        <button
+                    {selectedAccount._id
+                        ? <button
                             type="button"
                             onClick={() => deleteStaff(selectedAccount._id)}
                             className="text-white bg-red-500 hover:bg-red-600 px-9 py-2 rounded ml-2"
                         >
                             Delete
-                        </button> : null
+                        </button>
+                        : <span></span>
                     }
                     <button
                         type="button"

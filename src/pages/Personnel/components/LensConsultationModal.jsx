@@ -56,7 +56,6 @@ const AddOptions = <>
 </>;
 
 
-
 const LensConsultationModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => {
 
     const [formData, setFormData] = useState(defaultFields);
@@ -196,7 +195,7 @@ const LensConsultationModal = ({ handleCloseModal, isModalVisible, selectedPatie
                             }
                     }}
                         className="mb-2 p-2 w-full border rounded"
-                    />
+                />
 
 
                             <input
