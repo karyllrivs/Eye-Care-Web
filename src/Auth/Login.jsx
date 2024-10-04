@@ -18,7 +18,14 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [showPassword, setShowPassword] = useState(false); 
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  
 
+  const toggleShowPassword = () => {
+    setShowPassword((prev) => !prev); 
+  };
   /** Policy Feature */
   const [isPolicyAccepted, setIsPolicyAccepted] = useState(false);
   const togglePolicyConfirmation = () => {
@@ -61,6 +68,46 @@ const Login = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    setEmailError("");
+    setPasswordError("");
+
+    // Email format validation
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Simple email regex pattern
+    if (!emailPattern.test(email)) {
+      setEmailError("Please enter a valid email address."); // Set error message
+      return;
+    }
+
+    if (password.length < 8) {
+      setPasswordError("Password must be at least 8 characters long."); // Set password error message
+      return;
+  }
+  
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasNumbers = /\d/.test(password);
+  const hasSpecialChars = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  
+  if (!hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChars) {
+      setPasswordError("Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
+      return;
+  }
+  
+    
+
+    if (isLoginMode) {
+      if (!email || !password) {
+        setError("Fill all the empty fields.");
+        return;
+      }
+      
+      // ...existing code for login
+    } else {
+      if (!first_name || !last_name || !email || !password) {
+        setError("Fill all the empty fields.");
+        return;
+      }}
 
     if (isLoginMode) {
       if (!email || !password) {
@@ -190,7 +237,8 @@ const Login = () => {
 
             <form className="space-y-6" onSubmit={handleSubmit}>
               {error && <p className="text-red-500 text-sm">{error}</p>}
-
+              {emailError && <p className="text-red-500 text-sm">{emailError}</p>} {/* Display email error message */}
+              {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>} {/* Display password security error message */}
               {!isLoginMode && (
                 <>
                   <div>
@@ -254,25 +302,31 @@ const Login = () => {
               </div>
 
               <div>
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Password
-                </label>
-                <div className="mt-1">
-                  <input
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    value={password}
-                    onChange={handleChange}
-                    required
-                    className="px-2 py-3 mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
-                  />
-                </div>
-              </div>
-
+        <label
+          htmlFor="password"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Password
+        </label>
+        <div className="relative mt-1">
+          <input
+            name="password"
+            type={showPassword ? "text" : "password"} // Change input type based on state
+            autoComplete="current-password"
+            value={password}
+            onChange={handleChange}
+            required
+            className="px-2 py-3 mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+          />
+          <button
+            type="button"
+            onClick={toggleShowPassword} // Button to toggle password visibility
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500"
+          >
+            {showPassword ? "Hide" : "Show"} {/* Display toggle text */}
+          </button>
+        </div>
+      </div>
               <div className="flex justify-center mt-2">
                 {isLoginMode
                   ? <a href="/password-reset" className="hover:underline text-blue-500 cursor-pointer">Forgot password</a>
