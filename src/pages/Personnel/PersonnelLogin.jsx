@@ -126,12 +126,6 @@ const PersonnelLogin = () => {
                                         </label>
                                     </div>
                                 </div>
-                                <a
-                                    href="#"
-                                    className="text-sm font-medium text-primary-600 hover:underline"
-                                >
-                                    Forgot password?
-                                </a>
                             </div>
                             <button
                                 type="submit"
