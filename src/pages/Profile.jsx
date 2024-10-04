@@ -1,7 +1,7 @@
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { useState } from "react";
-import { AiOutlineMail, AiOutlinePhone, AiOutlineKey, AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { AiOutlineMail, AiOutlinePhone, AiOutlineKey, AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import InputField from "../components/InputField";
@@ -16,16 +16,25 @@ const Profile = () => {
   const currentUserProfile = useSelector(selectCurrentUserProfile);
   const [profile, setProfile] = useState(currentUserProfile);
   const [formFields, setFormFields] = useState(profile);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [passwordError, setPasswordError] = useState(""); // State for password error message
-  const [emailError, setEmailError] = useState(""); // State for email error message
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setConfirmPasswordVisible(!confirmPasswordVisible);
+  };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
 
+    // For mobile_number field, ensure it contains only 11-digit numbers
     if (name === "mobile_number") {
+      // Remove non-digit characters and limit to 11 digits
       const formattedValue = value.replace(/\D/g, "").slice(0, 11);
+
       setFormFields({
         ...formFields,
         [name]: formattedValue,
@@ -36,65 +45,26 @@ const Profile = () => {
         [name]: value,
       });
     }
-
-    // Reset password error when the user types in the password fields
-    if (name === "new_password" || name === "confirm_password") {
-      setPasswordError("");
-    }
-
-    // Reset email error when the user types in the email field
-    if (name === "email") {
-      setEmailError("");
-    }
   };
 
-  // Function to validate email format
-  const isValidEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  // Function to validate password strength
-  const isPasswordStrong = (password) => {
-    return password.length >= 8 && 
-           /[A-Z]/.test(password) && 
-           /[a-z]/.test(password) && 
-           /\d/.test(password) && 
-           /[!@#$%^&*(),.?":{}|<>]/.test(password);
-  };
-
-  // Function to load and preview the user image
   const loadUserImage = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormFields({
-          ...formFields,
-          image: reader.result, // Update the image state
-        });
-      };
-      reader.readAsDataURL(file); // Read the file as a data URL
-    }
+    let reader = new FileReader();
+    reader.onload = function () {
+      let output = document.getElementById("profileImagePreview");
+      output.src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+    setFormFields({
+      ...formFields,
+      image: event.target.files[0],
+    });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const { new_password, confirm_password, email } = formFields;
-
-    // Check for valid email format
-    if (!isValidEmail(email)) {
-      setEmailError("Invalid email format.");
-      return;
-    }
-
-    // Check for weak password
-    if (!isPasswordStrong(new_password)) {
-      setPasswordError("Password must be at least 8 characters long, contain upper and lower case letters, numbers, and special characters.");
-      return;
-    }
-
+    // Password validation
+    const { new_password, confirm_password } = formFields;
     if (new_password !== confirm_password) {
       toast.error("New password and confirm password do not match.", {
         position: "top-right",
@@ -171,9 +141,9 @@ const Profile = () => {
                     <img
                       id="profileImagePreview"
                       src={
-                        formFields.image || (profile.image
+                        profile.image
                           ? getFile(profile.image)
-                          : `https://eu.ui-avatars.com/api/?name=${first_name}+${last_name}&size=250`)
+                          : `https://eu.ui-avatars.com/api/?name=${first_name}+${last_name}&size=250`
                       }
                       alt="Profile Icon"
                       className="rounded-full w-24 md:w-48 h-24 md:h-48 mx-auto md:mx-0"
@@ -242,7 +212,6 @@ const Profile = () => {
                     onChange={handleChange}
                     icon={<AiOutlineMail />}
                   />
-                  {emailError && <p className="text-red-500 mb-2">{emailError}</p>} {/* Email error message */}
                 </div>
                 <div className="mb-4 md:ml-2 w-full md:w-1/2">
                   <InputField
@@ -256,56 +225,42 @@ const Profile = () => {
                 </div>
               </div>
               <div className="mb-4 flex flex-col md:flex-row">
-                <div className="mb-4 md:mr-2 w-full md:w-1/2 relative">
-                  <InputField
-                    label="New Password"
-                    type={showNewPassword ? "text" : "password"}
-                    name="new_password"
-                    value={new_password}
-                    onChange={handleChange}
-                    icon={<AiOutlineKey />}
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                  >
-                    {showNewPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-                  </button>
-                  {passwordError && <p className="text-red-500 mb-2">{passwordError}</p>} {/* Password error message */}
-                </div>
-                <div className="mb-4 md:ml-2 w-full md:w-1/2 relative">
-                  <InputField
-                    label="Confirm Password"
-                    type={showConfirmPassword ? "text" : "password"}
-                    name="confirm_password"
-                    value={confirm_password}
-                    onChange={handleChange}
-                    icon={<AiOutlineKey />}
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
-                    {showConfirmPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-                  </button>
-                </div>
+        <div className="mb-4 md:mr-2 w-full md:w-1/2">
+          <InputField
+            label="New Password"
+            type={passwordVisible ? "text" : "password"}
+            name="new_password"
+            value={new_password}
+            onChange={handleChange}
+            icon={<AiOutlineKey />}
+            rightIcon={passwordVisible ? <AiFillEyeInvisible onClick={togglePasswordVisibility} /> : <AiFillEye onClick={togglePasswordVisibility} />}
+          />
+        </div>
+        <div className="mb-4 md:ml-2 w-full md:w-1/2">
+          <InputField
+            label="Confirm New Password"
+            type={confirmPasswordVisible ? "text" : "password"}
+            name="confirm_password"
+            value={confirm_password}
+            onChange={handleChange}
+            icon={<AiOutlineKey />}
+            rightIcon={confirmPasswordVisible ? <AiFillEyeInvisible onClick={toggleConfirmPasswordVisibility} /> : <AiFillEye onClick={toggleConfirmPasswordVisibility} />}
+          />
+        </div>
               </div>
-
-              <div className="flex justify-between">
+              <div className="flex justify-end mt-8 pb-12">
+                <button
+                  type="submit"
+                  className="px-6 py-3 text-white bg-[#67BCEE] rounded mr-4 font-bold"
+                >
+                  Save Changes
+                </button>
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="bg-gray-300 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded"
+                  className="px-6 py-3 border border-gray-500 rounded mr-4 font-bold"
                 >
                   Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-                >
-                  Save changes
                 </button>
               </div>
             </form>
