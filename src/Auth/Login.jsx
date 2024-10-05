@@ -22,10 +22,10 @@ const Login = () => {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   
-
   const toggleShowPassword = () => {
     setShowPassword((prev) => !prev); 
   };
+
   /** Policy Feature */
   const [isPolicyAccepted, setIsPolicyAccepted] = useState(false);
   const togglePolicyConfirmation = () => {
@@ -89,13 +89,11 @@ const Login = () => {
   const hasNumbers = /\d/.test(password);
   const hasSpecialChars = /[!@#$%^&*(),.?":{}|<>]/.test(password);
   
-  if (!hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChars) {
+    if (!hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChars) {
       setPasswordError("Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
       return;
   }
   
-    
-
     if (isLoginMode) {
       if (!email || !password) {
         setError("Fill all the empty fields.");
@@ -109,37 +107,38 @@ const Login = () => {
         return;
       }}
 
-    if (isLoginMode) {
-      if (!email || !password) {
-        setError("Fill all the empty fields.");
-        return;
-      }
-
-      axiosClient
-        .post("/login", formFields)
-        .then(({ data: { currentUser, profile } }) => {
-          dispatch(setCurrentUser(currentUser));
-          dispatch(setCurrentUserProfile(profile));
-
-          resetFormFields();
-          navigate("/dashboard");
-        })
-        .catch(
-          ({
-            response: {
-              data: { message, notVerified },
-            },
-          }) => {
-            if (notVerified)
-              navigate("/verify-account");
-            setError(message);
-          }
-        );
-    } else {
-      if (!first_name || !last_name || !email || !password) {
-        setError("Fill all the empty fields.");
-        return;
-      }
+      if (isLoginMode) {
+        if (!email || !password) {
+          setError("Fill all the empty fields.");
+          return;
+        }
+  
+        axiosClient
+          .post("/login", formFields)
+          .then(({ data: { currentUser, profile } }) => {
+            dispatch(setCurrentUser(currentUser));
+            dispatch(setCurrentUserProfile(profile));
+  
+            resetFormFields();
+            navigate("/dashboard");
+          })
+          .catch(
+            ({
+              response: {
+                data: { message, notVerified },
+              },
+            }) => {
+              if (notVerified)
+                navigate("/verify-account");
+              setError(message);
+            }
+          );
+      } else {
+        if (!first_name || !last_name || !email || !password) {
+          setError("Fill all the empty fields.");
+          return;
+        }
+  
 
       /** Create User */
       axiosClient
