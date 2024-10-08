@@ -303,7 +303,7 @@ const Login = () => {
                   <button
                     type="button"
                     onClick={togglePasswordVisibility}
-                    className="absolute inset-y-0 right-0 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                    className="absolute inset-y-0 right-0 px-3 py-2 text-sm font-medium text-blue-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-sky-400"
                   >
                     {isPasswordVisible ? "Hide" : "Show"}
                   </button>
