@@ -1,7 +1,7 @@
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { useState } from "react";
-import { AiOutlineMail, AiOutlinePhone, AiOutlineKey, AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { AiOutlineMail, AiOutlinePhone, AiOutlineKey } from "react-icons/ai";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import InputField from "../components/InputField";
@@ -12,77 +12,45 @@ import { setCurrentUserProfile } from "../redux/profile/profile.action";
 import { selectCurrentUserProfile } from "../redux/profile/profile.selector";
 
 const Profile = () => {
+
   const dispatch = useDispatch();
   const currentUserProfile = useSelector(selectCurrentUserProfile);
+
   const [profile, setProfile] = useState(currentUserProfile);
+
   const [formFields, setFormFields] = useState(profile);
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-
-  const togglePasswordVisibility = () => {
-    setPasswordVisible(!passwordVisible);
-  };
-
-  const toggleConfirmPasswordVisibility = () => {
-    setConfirmPasswordVisible(!confirmPasswordVisible);
-  };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-
-    // For mobile_number field, ensure it contains only 11-digit numbers
-    if (name === "mobile_number") {
-      // Remove non-digit characters and limit to 11 digits
-      const formattedValue = value.replace(/\D/g, "").slice(0, 11);
-
-      setFormFields({
-        ...formFields,
-        [name]: formattedValue,
-      });
-    } else {
-      setFormFields({
-        ...formFields,
-        [name]: value,
-      });
-    }
+    setFormFields({
+      ...formFields,
+      [name]: value,
+    });
   };
 
   const loadUserImage = (event) => {
     let reader = new FileReader();
     reader.onload = function () {
-      let output = document.getElementById("profileImagePreview");
+      let output =
+        document.getElementById('profileImagePreview');
       output.src = reader.result;
     };
     reader.readAsDataURL(event.target.files[0]);
     setFormFields({
       ...formFields,
-      image: event.target.files[0],
+      image: event.target.files[0]
     });
-  };
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Password validation
-    const { new_password, confirm_password } = formFields;
-    if (new_password !== confirm_password) {
-      toast.error("New password and confirm password do not match.", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-      return;
-    }
 
     const { user_id } = currentUserProfile;
 
     axiosClient
       .put("/profiles/" + user_id, formFields, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          'Content-Type': 'multipart/form-data',
         },
       })
       .then(({ data: { message, profile } }) => {
@@ -107,7 +75,7 @@ const Profile = () => {
           alert(message);
         }
       );
-  };
+  }
 
   const handleReset = () => {
     setFormFields(profile);
@@ -129,22 +97,22 @@ const Profile = () => {
       <div className="flex">
         <Sidebar />
         <div className="flex-grow pl-[20rem] pr-[4rem]">
+          {" "}
+          {/* Adjust margin-left to account for wider sidebar */}
           <div className="container mx-auto mt-10 px-4 lg:px-0">
             <h1 className="text-2xl font-bold text-[#384D6C] mb-4 underline pb-8">
               User Profile
             </h1>
 
+            {/* Form */}
             <form onSubmit={handleSubmit}>
+
               <div className="flex flex-col md:flex-row items-center border-b-2 border-gray-300 pb-9 mb-8">
                 <div className="mb-4 md:mr-4">
                   <label htmlFor="userImage">
                     <img
                       id="profileImagePreview"
-                      src={
-                        profile.image
-                          ? getFile(profile.image)
-                          : `https://eu.ui-avatars.com/api/?name=${first_name}+${last_name}&size=250`
-                      }
+                      src={profile.image ? getFile(profile.image) : `https://eu.ui-avatars.com/api/?name=${first_name}+${last_name}&size=250`}
                       alt="Profile Icon"
                       className="rounded-full w-24 md:w-48 h-24 md:h-48 mx-auto md:mx-0"
                     />
@@ -161,14 +129,9 @@ const Profile = () => {
                   <h1 className="text-2xl font-bold text-[#384D6C] mb-2">
                     {first_name + " " + last_name}
                   </h1>
-                  {address && (
-                    <p className="text-gray-600 mb-1">Address: {address}</p>
-                  )}
-                  {mobile_number && (
-                    <p className="text-gray-600 mb-1">
-                      Contact: {mobile_number}
-                    </p>
-                  )}
+                  {address &&
+                    <p className="text-gray-600 mb-1">Address: {address}</p>}
+                  {mobile_number && <p className="text-gray-600 mb-1">Contact: {mobile_number}</p>}
                   <p className="text-gray-600">Email: {email}</p>
                 </div>
               </div>
@@ -225,28 +188,26 @@ const Profile = () => {
                 </div>
               </div>
               <div className="mb-4 flex flex-col md:flex-row">
-        <div className="mb-4 md:mr-2 w-full md:w-1/2">
-          <InputField
-            label="New Password"
-            type={passwordVisible ? "text" : "password"}
-            name="new_password"
-            value={new_password}
-            onChange={handleChange}
-            icon={<AiOutlineKey />}
-            rightIcon={passwordVisible ? <AiFillEyeInvisible onClick={togglePasswordVisibility} /> : <AiFillEye onClick={togglePasswordVisibility} />}
-          />
-        </div>
-        <div className="mb-4 md:ml-2 w-full md:w-1/2">
-          <InputField
-            label="Confirm New Password"
-            type={confirmPasswordVisible ? "text" : "password"}
-            name="confirm_password"
-            value={confirm_password}
-            onChange={handleChange}
-            icon={<AiOutlineKey />}
-            rightIcon={confirmPasswordVisible ? <AiFillEyeInvisible onClick={toggleConfirmPasswordVisibility} /> : <AiFillEye onClick={toggleConfirmPasswordVisibility} />}
-          />
-        </div>
+                <div className="mb-4 md:mr-2 w-full md:w-1/2">
+                  <InputField
+                    label="New Password"
+                    type="password"
+                    name="new_password"
+                    value={new_password}
+                    onChange={handleChange}
+                    icon={<AiOutlineKey />}
+                  />
+                </div>
+                <div className="mb-4 md:ml-2 w-full md:w-1/2">
+                  <InputField
+                    label="Confirm New Password"
+                    type="password"
+                    name="confirm_password"
+                    value={confirm_password}
+                    onChange={handleChange}
+                    icon={<AiOutlineKey />}
+                  />
+                </div>
               </div>
               <div className="flex justify-end mt-8 pb-12">
                 <button
@@ -258,7 +219,7 @@ const Profile = () => {
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="px-6 py-3 border border-gray-500 rounded mr-4 font-bold"
+                  className="px-6 py-3 border border-gray-500 rounded  mr-4 font-bold"
                 >
                   Cancel
                 </button>
