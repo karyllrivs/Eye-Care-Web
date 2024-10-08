@@ -27,6 +27,23 @@ const Consultation = () => {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
+
+    // Validate mobile number if the field is mobile
+    if (name === "mobile") {
+    // Allow only digits and limit to 11 digits
+    if (!/^\d*$/.test(value) || value.length > 11) {
+    toast.error("Mobile number must be an 11-digit number without letters!", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+    return; // Stop updating the state
+    }
+  } 
+
     setFormFields({
       ...formFields,
       [name]: value,
