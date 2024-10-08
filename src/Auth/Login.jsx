@@ -16,6 +16,7 @@ import GoogleButton from "react-google-button";
 const Login = () => {
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [error, setError] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false); // Show/Hide password state
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -59,6 +60,23 @@ const Login = () => {
     });
   };
 
+  // Password strength validation
+  const validatePasswordStrength = (password) => {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    return (
+      password.length >= minLength &&
+      hasUpperCase &&
+      hasLowerCase &&
+      hasNumber &&
+      hasSpecialChar
+    );
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -91,6 +109,14 @@ const Login = () => {
     } else {
       if (!first_name || !last_name || !email || !password) {
         setError("Fill all the empty fields.");
+        return;
+      }
+
+      // Check for password strength
+      if (!validatePasswordStrength(password)) {
+        setError(
+          "Password must be at least 8 characters long, contain an uppercase letter, a lowercase letter, a number, and a special character."
+        );
         return;
       }
 
@@ -152,6 +178,10 @@ const Login = () => {
         }
       );
   }
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
 
 
   return (
@@ -260,16 +290,23 @@ const Login = () => {
                 >
                   Password
                 </label>
-                <div className="mt-1">
+                <div className="relative mt-1">
                   <input
                     name="password"
-                    type="password"
+                    type={isPasswordVisible ? "text" : "password"} // Toggle password visibility
                     autoComplete="current-password"
                     value={password}
                     onChange={handleChange}
                     required
                     className="px-2 py-3 mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
                   />
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="absolute inset-y-0 right-0 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                  >
+                    {isPasswordVisible ? "Hide" : "Show"}
+                  </button>
                 </div>
               </div>
 
