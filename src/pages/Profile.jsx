@@ -15,10 +15,15 @@ const Profile = () => {
 
   const dispatch = useDispatch();
   const currentUserProfile = useSelector(selectCurrentUserProfile);
-
   const [profile, setProfile] = useState(currentUserProfile);
-
   const [formFields, setFormFields] = useState(profile);
+  const [emailError, setEmailError] = useState('');
+  const [mobileError, setMobileError] = useState(''); // State for mobile error
+  const [passwordError, setPasswordError] = useState(''); // State for password error
+
+  // State for password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -26,7 +31,33 @@ const Profile = () => {
       ...formFields,
       [name]: value,
     });
-  };
+
+      // Allow only digits for mobile number input
+      if (name === 'mobile_number') {
+        const numericValue = value.replace(/\D/g, ''); // Remove non-digit characters
+        setFormFields({
+          ...formFields,
+          [name]: numericValue.length > 11 ? numericValue.slice(0, 11) : numericValue,
+        });
+        
+        // Clear mobile error when user is typing
+      if (numericValue.length >= 11) {
+        setMobileError('');
+      } else {
+        setMobileError('Mobile number must be 11 digits.');
+      }
+    } else {
+      setFormFields({
+        ...formFields,
+        [name]: value,
+      });
+  
+        // Clear email error if user modifies the email field
+        if (name === 'email') {
+          setEmailError('');
+        }
+      }
+    };
 
   const loadUserImage = (event) => {
     let reader = new FileReader();
@@ -42,8 +73,44 @@ const Profile = () => {
     });
   }
 
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[a-z]{2,6}$/i;
+    return re.test(email);
+  };  
+
+  const validatePassword = (password) => {
+    // Enforce password rules: at least 8 characters, with uppercase, lowercase, number, and special character
+    const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return re.test(password);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+
+     // Email validation
+     if (!validateEmail(formFields.email)) {
+      setEmailError('Please enter a valid email address.');
+      return;
+    }
+
+    // Mobile number validation
+    if (formFields.mobile_number.length < 11) {
+      setMobileError('Mobile number must be 11 digits.');
+      return;
+    }
+
+    // Password validation
+    if (formFields.new_password || formFields.confirm_password) {
+      if (!validatePassword(formFields.new_password)) {
+        setPasswordError('Password must be at least 8 characters long, contain uppercase, lowercase, a number, and a special character.');
+        return;
+      }
+
+      if (formFields.new_password !== formFields.confirm_password) {
+        setPasswordError('New Password and Confirm Password do not match.');
+        return;
+      }
+    }
 
     const { user_id } = currentUserProfile;
 
@@ -79,6 +146,9 @@ const Profile = () => {
 
   const handleReset = () => {
     setFormFields(profile);
+    setEmailError(''); // Reset email error on reset
+    setMobileError(''); // Reset mobile error on reset
+    setPasswordError(''); // Reset password error on reset
   };
 
   const {
@@ -175,6 +245,7 @@ const Profile = () => {
                     onChange={handleChange}
                     icon={<AiOutlineMail />}
                   />
+                  {emailError && <p className="text-red-500">{emailError}</p>}
                 </div>
                 <div className="mb-4 md:ml-2 w-full md:w-1/2">
                   <InputField
@@ -184,31 +255,52 @@ const Profile = () => {
                     value={mobile_number}
                     onChange={handleChange}
                     icon={<AiOutlinePhone />}
+                    pattern="\d{11}" // Optional: restrict to 11 digits
+                    maxLength="11"   // Prevent typing more than 11 digits
                   />
+                  {mobileError && <p className="text-red-500">{mobileError}</p>} {/* Display mobile error message */}
                 </div>
               </div>
               <div className="mb-4 flex flex-col md:flex-row">
-                <div className="mb-4 md:mr-2 w-full md:w-1/2">
+                <div className="mb-4 md:mr-2 w-full md:w-1/2 relative">
                   <InputField
                     label="New Password"
-                    type="password"
+                    type={showPassword ? "text" : "password"} // Toggle between text and password
                     name="new_password"
                     value={new_password}
                     onChange={handleChange}
                     icon={<AiOutlineKey />}
                   />
+                  {/* Show/Hide toggle */}
+                  <button
+                    type="button"
+                    className="absolute right-3 top-10 text-sm text-blue-600"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? "Hide" : "Show"} 
+                  </button>
                 </div>
-                <div className="mb-4 md:ml-2 w-full md:w-1/2">
+                <div className="mb-4 md:ml-2 w-full md:w-1/2 relative">
                   <InputField
                     label="Confirm New Password"
-                    type="password"
+                    type={showConfirmPassword ? "text" : "password"} // Toggle between text and password
                     name="confirm_password"
                     value={confirm_password}
                     onChange={handleChange}
                     icon={<AiOutlineKey />}
+                    
                   />
+                   {/* Show/Hide toggle */}
+                   <button
+                    type="button"
+                    className="absolute right-3 top-10 text-sm text-blue-600"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? "Hide" : "Show"} 
+                  </button>
                 </div>
               </div>
+              {passwordError && <p className="text-red-500">{passwordError}</p>} {/* Display password error message */}
               <div className="flex justify-end mt-8 pb-12">
                 <button
                   type="submit"
