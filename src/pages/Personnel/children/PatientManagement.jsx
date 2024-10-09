@@ -78,7 +78,12 @@ const PatientManagement = () => {
                         <div className="flex gap-2">
                             {FilterSearch}
                             {TimeFrequencyFilter}
+                       
+                        <div className="ml-auto">
+                        <PrintToPDFButton handlePrint={handlePrint} />
                         </div>
+                    </div>
+
                         <div className="relative overflow-x-auto shadow-md sm:rounded-lg border-2" ref={divRef}>
                             <table className="w-full text-sm text-left rtl:text-right text-gray-900 dark:text-gray-900">
                                 <thead className="bg-gray-200">
@@ -137,11 +142,7 @@ const PatientManagement = () => {
                         </div>
                     </div>
 
-                    <div className="flex justify-between">
-                        <PrintToPDFButton handlePrint={handlePrint} />
-
-
-                    </div>
+                
 
                     {/* MODAL */}
                     <PatientModal

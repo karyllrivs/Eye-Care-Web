@@ -81,6 +81,9 @@ const InventoryManagement = () => {
                         <div className="flex gap-2">
                             {FilterSearch}
                             {TimeFrequencyFilter}
+                            <div className="ml-auto">
+                                <PrintToPDFButton handlePrint={handlePrint} />
+                            </div>
                         </div>
                         <div className="relative overflow-x-auto shadow-md sm:rounded-lg border-2" ref={divRef}>
                             <table className="w-full text-sm text-left rtl:text-right text-gray-900 dark:text-gray-900">
@@ -141,13 +144,6 @@ const InventoryManagement = () => {
                                 </tbody>
                             </table>
                         </div>
-                    </div>
-
-                    <div className="flex justify-between">
-                        <PrintToPDFButton handlePrint={handlePrint} />
-
-                     
-                     
                     </div>
 
                     {/* Product Modal */}

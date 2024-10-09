@@ -126,8 +126,11 @@ const ConsultationManagement = () => {
                                 {FilterSearch}
                                 {TimeFrequencyFilter}
                             </div>
-                            <button onClick={toggleList} className="no-underline hover:underline text-blue-500 text-xl"> {isArchivedList ? "Consultation List" : "Archived"}</button>
-                        </div>
+                                <div className="flex items-center gap-4 ml-auto">
+                                <PrintToPDFButton handlePrint={handlePrint} />
+                                <button onClick={toggleList} className="no-underline hover:underline text-blue-500 text-xl"> {isArchivedList ? "Consultation List" : "Archived"}</button>
+                                </div>
+                            </div>
                         <div className="relative overflow-x-auto shadow-md sm:rounded-lg border-2" ref={divRef}>
                             <table className="w-full text-sm text-left rtl:text-right text-gray-900 dark:text-gray-900">
                                 <thead className="bg-gray-200">
@@ -213,10 +216,7 @@ const ConsultationManagement = () => {
                         </div>
                     </div>
 
-                    <div className="flex justify-between">
-                        <PrintToPDFButton handlePrint={handlePrint} />
-
-                    </div>
+                
                 </>
             }
 

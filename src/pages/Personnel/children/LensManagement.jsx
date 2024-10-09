@@ -76,7 +76,11 @@ const LensManagement = () => {
                         <div className="flex gap-2">
                             {FilterSearch}
                             {TimeFrequencyFilter}
-                        </div>
+
+                            <div className="ml-auto">
+                                <PrintToPDFButton handlePrint={handlePrint} />
+                            </div>
+                    </div>
 
                         <div className="relative overflow-x-auto shadow-md sm:rounded-lg" ref={divRef}>
                             <table className="w-full text-sm text-left rtl:text-right text-gray-900 dark:text-gray-900">
@@ -142,12 +146,6 @@ const LensManagement = () => {
                         </div>
                     </div>
 
-                    <div className="flex justify-between">
-                        <PrintToPDFButton handlePrint={handlePrint} />
-
-            
-
-                    </div>
 
                     <LensConsultationModal handleCloseModal={handleCloseModal} isModalVisible={isModalVisible} selectedPatient={selectedPatient} />
                 </>

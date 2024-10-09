@@ -66,6 +66,11 @@ const AccountManagement = () => {
                     <div className="my-10">
                         <div className="flex gap-2">
                             {TimeFrequencyFilter}
+                            
+                            <div className="ml-auto">
+                                <PrintToPDFButton handlePrint={handlePrint} />
+                            </div>
+                            
                         </div>
 
                         <div className="relative overflow-x-auto shadow-md sm:rounded-lg" ref={divRef}>
