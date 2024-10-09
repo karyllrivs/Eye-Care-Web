@@ -14,6 +14,8 @@ const PersonnelLogin = () => {
         password: "",
     });
     const [error, setError] = useState("");
+    const [showPassword, setShowPassword] = useState(false); // New state for toggling password visibility
+
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -21,6 +23,10 @@ const PersonnelLogin = () => {
             ...formFields,
             [name]: value,
         });
+    };
+
+    const togglePasswordVisibility = () => {
+        setShowPassword((prevState) => !prevState); // Toggles between true and false
     };
 
     const handleSubmit = (event) => {
@@ -98,8 +104,9 @@ const PersonnelLogin = () => {
                                 >
                                     Your password
                                 </label>
+                                <div className="relative">
                                 <input
-                                    type="password"
+                                    type={showPassword ? "text" : "password"} // Toggle between text and password
                                     name="password"
                                     id="password"
                                     placeholder="••••••••"
@@ -108,6 +115,14 @@ const PersonnelLogin = () => {
                                     value={password}
                                     onChange={handleChange}
                                 />
+                                <button
+                                        type="button"
+                                        onClick={togglePasswordVisibility}
+                                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                                    >
+                                        {showPassword ? "Hide" : "Show"}
+                                    </button>
+                                    </div>
                             </div>
                             <div className="flex items-center justify-between">
                                 <div className="flex items-start">
