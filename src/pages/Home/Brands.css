@@ -6,12 +6,12 @@
 
 .brand {
   flex: 0 0 auto;
-  width: 12.5%; /* Assuming 8 brands visible at a time */
+  width: 12.5%; 
 }
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .brand {
-    width: 25%; /* Show 4 brands at a time */
+    width: 25%; 
   }
 }

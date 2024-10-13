@@ -91,7 +91,7 @@ const Footer = () => {
           </div>
           <hr className="my-6 border-gray-200 dark:border-gray-700" />
           <div className="text-sm  text-[#253D4E] text-center ">
-            © 2023{" "}
+            © 2024{" "}
             <a href="" className="hover:underline">
               EYECARE™
             </a>
