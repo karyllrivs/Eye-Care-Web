@@ -77,7 +77,7 @@ const Footer = () => {
               </h2>
               <ul className="text-[#253D4E]">
                 <li className="mb-6 text-[#253D4E] font-semibold">
-                  <a href="#" className="hover:underline">
+                  <a href="#" className="">
                     From Google Play
                   </a>
                 </li>
