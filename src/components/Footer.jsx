@@ -48,27 +48,12 @@ const Footer = () => {
               </h2>
               <ul className="text-[#253D4E]">
                 <li className="mb-4">
-                  <a href="#" className="hover:underline">
+                  <a href="#footer" className="hover:underline">
                     About Us
                   </a>
                 </li>
-                <li className="mb-4">
-                  <a href="#" className="hover:underline">
-                    Delivery Information
-                  </a>
-                </li>
-                <li className="mb-4">
-                  <a href="#" className="hover:underline">
-                    Privacy Policy
-                  </a>
-                </li>
-                <li className="mb-4">
-                  <a href="#" className="hover:underline">
-                    Terms & Conditions
-                  </a>
-                </li>
                 <li>
-                  <a href="#" className="hover:underline">
+                  <a href="#footer" className="hover:underline">
                     Contact Us
                   </a>
                 </li>
@@ -80,7 +65,7 @@ const Footer = () => {
               </h2>
               <ul className="text-[#253D4E]">
                 <li className="mb-4">
-                  <a href="#" className="hover:underline">
+                  <a href="login" className="hover:underline">
                     Create Account
                   </a>
                 </li>

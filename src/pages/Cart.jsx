@@ -119,14 +119,6 @@ const Cart = () => {
                   <span>Subtotal</span>
                   <span>{"₱" + parseFloat(cartTotal.toFixed(2))}</span>
                 </div>
-                <div className="flex justify-between mb-2">
-                  <span>Taxes</span>
-                  <span>₱0.00</span>
-                </div>
-                <div className="flex justify-between mb-2">
-                  <span>Shipping</span>
-                  <span>₱0.00</span>
-                </div>
                 <hr className="my-2" />
                 <div className="flex justify-between mb-2">
                   <span className="font-semibold">Total</span>
