@@ -1,17 +1,30 @@
+/* Brands.css */
+
 .brands-container {
   display: flex;
-  overflow-x: auto;
-  transition: transform 0.5s ease;
+  flex-wrap: wrap; /* Allow wrapping of items */
+  overflow: hidden; /* Prevent horizontal scrolling */
+  justify-content: center; /* Center items */
 }
 
 .brand {
-  flex: 0 0 auto;
-  width: 12.5%; 
+  flex: 0 0 auto; /* Prevent flex items from shrinking */
+  width: 12.5%; /* Show 8 brands at a time on larger screens */
 }
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .brand {
-    width: 25%; 
+    width: 100%; /* Show only one brand at a time on mobile */
+    max-width: 300px; /* Set a maximum width for the brand container */
+    margin: auto; /* Center the brand container */
   }
+}
+
+/* Ensure the logo card has consistent dimensions */
+.bg-brand {
+  background-color: #F2FCE4; /* Set the background color here */
+  height: auto; /* Let the height adjust based on content */
+  max-height: 200px; /* Prevent the logo from being too tall */
+  padding: 1rem; /* Padding for the container */
 }
