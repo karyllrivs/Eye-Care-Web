@@ -102,7 +102,7 @@ const InventoryManagement = () => {
                                     id="category-select"
                                     value={selectedCategory}
                                     onChange={(e) => setSelectedCategory(e.target.value)}
-                                    className="p-2 border border-gray-300 rounded-lg bg-white text-gray-600 text-sm"  // Adjust font style here
+                                    className="p-2 border border-gray-300 rounded-lg bg-white text-gray-600 text-sm"   // Adjust font style here
                                     style={{ height: '46px' }}  // Adjusting height to match the search bar
                                 >
                                     {categories.map((category, index) => (
@@ -113,7 +113,11 @@ const InventoryManagement = () => {
                                 </select>
                             </div>
 
-                            
+
+                            {TimeFrequencyFilter}
+                            <div className="ml-auto">
+                                <PrintToPDFButton handlePrint={handlePrint} />
+                            </div>
                         </div>
 
                         <div className="relative overflow-x-auto shadow-md sm:rounded-lg border-2" ref={divRef}>
