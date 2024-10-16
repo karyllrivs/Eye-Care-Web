@@ -10,10 +10,16 @@ import useTimeFrequencyFilter from "../components/TimeFrequencyFilter";
 
 const InventoryManagement = () => {
     const [products, setProducts] = useState([]);
+
+    // First apply time frequency filter
+    const [TimeFrequencyFilter, timeFrequencyFilteredItems] = useTimeFrequencyFilter(products);
+
+    // Then apply search filter on the already time-filtered items
+    const [FilterSearch, filteredData] = useFilterSearch(timeFrequencyFilteredItems, ["name"]);
+
     const [categories, setCategories] = useState([]); // State to store categories
     const [selectedCategory, setSelectedCategory] = useState("All Categories"); // State to manage selected category
-    const [TimeFrequencyFilter, timeFrequencyFilteredItems] = useTimeFrequencyFilter(products);
-    const [FilterSearch, filteredData] = useFilterSearch(products, ["name"]);
+
 
     /** PRODUCT MODAL */
     const [selectedProduct, setSelectedProduct] = useState({});

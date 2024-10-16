@@ -17,8 +17,8 @@ const defaultValue = {
 };
 
 const Analytics = () => {
-
     const [analytics, setAnalytics] = useState(defaultValue);
+    const [timeFilter, setTimeFilter] = useState("all");
 
     useEffect(() => {
         axiosClient
@@ -35,9 +35,60 @@ const Analytics = () => {
                     alert(message);
                 }
             );
-    }, [])
+    }, []);
 
     const { totalSalesAmount, customerTotal, orderTotal, patientTotal, customers, sales, patients } = analytics;
+
+    // Function to filter data based on the selected time filter
+    const filterDataByTime = (data) => {
+        const currentDate = new Date();
+        let filteredData;
+
+        switch (timeFilter) {
+            case "daily":
+                filteredData = data.filter(item => {
+                    const itemDate = new Date(item.date);
+                    return itemDate.toDateString() === currentDate.toDateString(); // Compare dates only
+                });
+                break;
+            case "weekly":
+                filteredData = data.filter(item => {
+                    const itemDate = new Date(item.date);
+                    const weekStart = new Date(currentDate);
+                    weekStart.setDate(currentDate.getDate() - currentDate.getDay()); // Get start of the week
+                    return itemDate >= weekStart && itemDate <= currentDate; // Current week filter
+                });
+                break;
+            case "monthly":
+                filteredData = data.filter(item => {
+                    const itemDate = new Date(item.date);
+                    return itemDate.getMonth() === currentDate.getMonth() && itemDate.getFullYear() === currentDate.getFullYear();
+                });
+                break;
+            case "6months":
+                filteredData = data.filter(item => {
+                    const itemDate = new Date(item.date);
+                    const sixMonthsAgo = new Date(currentDate.setMonth(currentDate.getMonth() - 6));
+                    return itemDate >= sixMonthsAgo;
+                });
+                break;
+            case "annual":
+                filteredData = data.filter(item => {
+                    const itemDate = new Date(item.date);
+                    return itemDate.getFullYear() === currentDate.getFullYear();
+                });
+                break;
+            default: // "all"
+                filteredData = data; // No filtering
+                break;
+        }
+        return filteredData;
+    };
+
+    // Apply filters to customers, sales, and patients
+    const filteredCustomers = useMemo(() => filterDataByTime(customers), [customers, timeFilter]);
+    const filteredSales = useMemo(() => filterDataByTime(sales), [sales, timeFilter]);
+    const filteredPatients = useMemo(() => filterDataByTime(patients), [patients, timeFilter]);
 
     const barData = useMemo(() => {
         return {
@@ -45,30 +96,30 @@ const Analytics = () => {
             datasets: [
                 {
                     label: 'Customers',
-                    data: placeCustomersOnMonth(customers),
+                    data: placeCustomersOnMonth(filteredCustomers),
                     backgroundColor: '#FF6384',
                 },
                 {
                     label: 'Patients',
-                    data: placePatientsOnMonth(patients),
+                    data: placePatientsOnMonth(filteredPatients),
                     backgroundColor: '#36A2EB',
                 },
             ],
         }
-    }, [patients, customers]);
+    }, [filteredCustomers, filteredPatients]);
 
     const lineData = useMemo(() => {
         return {
             labels: getMonths,
             datasets: [{
                 label: 'Sales',
-                data: placeSalesOnMonth(sales),
+                data: placeSalesOnMonth(filteredSales),
                 fill: false,
                 borderColor: '#FF6384',
                 tension: 0.1
             }]
         };
-    }, [sales]);
+    }, [filteredSales]);
 
     const divRef = useRef();
     const handlePrint = () => {
@@ -81,8 +132,17 @@ const Analytics = () => {
         <div className="px-16 py-8">
             <h1 className="text-5xl font-bold">Analytics</h1>
 
+            <div className="my-10">
+                <button onClick={() => setTimeFilter("daily")} className={`px-4 py-2 mr-2 rounded ${timeFilter === "daily" ? "bg-blue-500 text-white" : "bg-gray-200"}`}>Daily</button>
+                <button onClick={() => setTimeFilter("weekly")} className={`px-4 py-2 mr-2 rounded ${timeFilter === "weekly" ? "bg-blue-500 text-white" : "bg-gray-200"}`}>Weekly</button>
+                <button onClick={() => setTimeFilter("monthly")} className={`px-4 py-2 mr-2 rounded ${timeFilter === "monthly" ? "bg-blue-500 text-white" : "bg-gray-200"}`}>Monthly</button>
+                <button onClick={() => setTimeFilter("6months")} className={`px-4 py-2 mr-2 rounded ${timeFilter === "6months" ? "bg-blue-500 text-white" : "bg-gray-200"}`}>6 Months</button>
+                <button onClick={() => setTimeFilter("annual")} className={`px-4 py-2 mr-2 rounded ${timeFilter === "annual" ? "bg-blue-500 text-white" : "bg-gray-200"}`}>Annual</button>
+                <button onClick={() => setTimeFilter("all")} className={`px-4 py-2 rounded ${timeFilter === "all" ? "bg-blue-500 text-white" : "bg-gray-200"}`}>All Time</button>
+            </div>
+
             <div ref={divRef}>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6  my-10">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6 my-10">
                     <div className="bg-blue-100 p-4 rounded">
                         <h2 className="text-xl font-semibold mb-2">Total Sales</h2>
                         <p className="text-2xl font-bold">₱{totalSalesAmount}</p>
@@ -117,8 +177,8 @@ const Analytics = () => {
                 </div>
             </div>
             <PrintToPDFButton handlePrint={handlePrint} />
-        </div >
+        </div>
     );
 }
 
-export default Analytics
+export default Analytics;
