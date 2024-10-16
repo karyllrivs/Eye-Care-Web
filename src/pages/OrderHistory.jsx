@@ -50,7 +50,7 @@ const OrderHistory = () => {
       <Navbar />
       <div className="flex">
         <Sidebar />
-        <div className="flex-grow pl-[20rem] pr-[4rem]">
+        <div className="flex-grow pl-[20rem] pr-[4rem] pl-[80px] pr-5 md:pl-[20rem] md:pr-[4rem]">
           <div className="container mx-auto mt-10 px-4 lg:px-0">
             <h1 className="text-2xl font-bold text-[#384D6C] mb-4 underline pb-8">
               Order History
@@ -67,33 +67,34 @@ const OrderHistory = () => {
                     </th>
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
                     >
                       Image
                     </th>
+
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
                     >
                       Ordered On
                     </th>
 
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
                     >
                       Status
                     </th>
 
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
                     >
                       Quantity
                     </th>
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
                     >
                       Total
                     </th>
@@ -109,16 +110,46 @@ const OrderHistory = () => {
                   {orders.map((order) => (
                     <tr key={order._id}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+
+
+                        
                         {order._id.toUpperCase()}
+                        
+                        <img src={getFile(order.image)} alt="Glasses" className="h-8 lg:hidden" />
+                        <br/>
+                        <span className=" lg:hidden">
+                        Ordered On: {order.delivered_on}
+                        </span>
+                        <br/>
+
+                        <span
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full lg:hidden ${order.status === "Delivered"
+                            ? "bg-green-100 text-green-800"
+                            : order.status === "Pending"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : order.status === "Confirmed" ? "bg-blue-100 text-blue-800" : "bg-red-100 text-red-800"
+                            }`}
+                        >Status: {order.status}</span>
+                          <br/>
+                            <span className=" lg:hidden">
+                            Quantity: {order.quantity}
+                            </span>
+                            <br />
+                          <span className=" lg:hidden">  
+                          Total: ₱{order.total}
+                          </span>
+
+
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+
+                      <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                         <img src={getFile(order.image)} alt="Glasses" className="h-8" />
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">
                         {order.delivered_on}
                       </td>
 
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                         <span
                           className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${order.status === "Delivered"
                             ? "bg-green-100 text-green-800"
@@ -131,10 +162,10 @@ const OrderHistory = () => {
                         </span>
                       </td>
 
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                         {order.quantity}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">
                         ₱{order.total}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">

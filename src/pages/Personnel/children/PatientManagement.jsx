@@ -8,16 +8,9 @@ import useTimeFrequencyFilter from "../components/TimeFrequencyFilter";
 import useFilterSearch from "../components/FilterSearch.jsx";
 
 const PatientManagement = () => {
-
     const [patients, setPatients] = useState([]);
     const [TimeFrequencyFilter, timeFrequencyFilteredItems] = useTimeFrequencyFilter(patients);
-    const [FilterSearch, filteredData] = useFilterSearch(patients, ["name",
-        "email",
-        "mobile",
-        "address",
-        "age",
-        "birthday",
-        "gender"]);
+    const [FilterSearch, filteredData] = useFilterSearch(patients, ["name", "email", "mobile", "address", "age", "birthday", "gender"]);
 
     /** MODAL */
     const [selectedPatient, setSelectedPatient] = useState({});
@@ -40,15 +33,9 @@ const PatientManagement = () => {
             .then(({ data }) => {
                 setPatients(data);
             })
-            .catch(
-                ({
-                    response: {
-                        data: { message },
-                    },
-                }) => {
-                    alert(message);
-                }
-            );
+            .catch(({ response: { data: { message } } }) => {
+                alert(message);
+            });
     }, []);
 
     const divRef = useRef();
@@ -56,67 +43,50 @@ const PatientManagement = () => {
         const input = divRef.current;
         const title = "Patients Reports";
         printPage(input, title);
-    }
+    };
 
     return (
-        <div className="px-16 py-8">
+        <div className="px-4 md:px-16 py-8"> {/* Adjusted padding for smaller screens */}
             <div className="flex justify-between">
-                <h1 className="text-5xl font-bold">Patient Management</h1>
+                <h1 className="text-3xl md:text-5xl font-bold">Patient Management</h1>
                 <button
-                    className="text-white bg-green-500 shadow hover:bg-green-600 px-9 py-2 rounded"
+                    className="text-white bg-green-500 shadow hover:bg-green-600 px-4 md:px-9 py-2 rounded" // Adjusted padding for smaller screens
                     onClick={handleOpenAddModal}
                 >
                     Add Patient
                 </button>
             </div>
 
-            {patients.length == 0 ?
+            {patients.length === 0 ? (
                 <h2 className="text-2xl py-5">No data at the moment.</h2>
-                :
+            ) : (
                 <>
                     <div className="my-10">
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-wrap"> {/* Added flex-wrap for better layout on smaller screens */}
                             {FilterSearch}
                             {TimeFrequencyFilter}
-                       
-                        <div className="ml-auto">
-                        <PrintToPDFButton handlePrint={handlePrint} />
+                            <div className="ml-auto">
+                                <PrintToPDFButton handlePrint={handlePrint} />
+                            </div>
                         </div>
-                    </div>
 
                         <div className="relative overflow-x-auto shadow-md sm:rounded-lg" ref={divRef}>
-                            <table className="w-full text-sm text-left rtl:text-right text-gray-900 dark:text-gray-900">
+                            <table className="min-w-full text-sm text-left rtl:text-right text-gray-900 dark:text-gray-900">
                                 <thead className="bg-gray-200">
                                     <tr>
-                                        <th scope="col" className="px-6 py-3">
-                                            Name
-                                        </th>
-                                        <th scope="col" className="px-6 py-3">
-                                            Email
-                                        </th>
-                                        <th scope="col" className="px-6 py-3">
-                                            Contact Number
-                                        </th>
-                                        <th scope="col" className="px-6 py-3">
-                                            Address
-                                        </th>
-                                        <th scope="col" className="px-6 py-3">
-                                            Age
-                                        </th>
-                                        <th scope="col" className="px-6 py-3">
-                                            Birthday
-                                        </th>
-                                        <th scope="col" className="px-6 py-3">
-                                            Gender
-                                        </th>
-                                        <th scope="col" className="px-6 py-3">
-                                            Actions
-                                        </th>
+                                        <th scope="col" className="px-6 py-3">Name</th>
+                                        <th scope="col" className="px-6 py-3">Email</th>
+                                        <th scope="col" className="px-6 py-3">Contact Number</th>
+                                        <th scope="col" className="px-6 py-3">Address</th>
+                                        <th scope="col" className="px-6 py-3">Age</th>
+                                        <th scope="col" className="px-6 py-3">Birthday</th>
+                                        <th scope="col" className="px-6 py-3">Gender</th>
+                                        <th scope="col" className="px-6 py-3">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {filteredData.map((patient, index) => (
-                                        <tr key={index} className="bg-white  dark:border-gray-700">
+                                        <tr key={index} className="bg-white dark:border-gray-700">
                                             <td className="px-6 py-4">
                                                 <MdEventNote className="mr-2 text-xl inline" />
                                                 {patient.name}
@@ -142,8 +112,6 @@ const PatientManagement = () => {
                         </div>
                     </div>
 
-                
-
                     {/* MODAL */}
                     <PatientModal
                         handleCloseModal={handleCloseModal}
@@ -151,9 +119,9 @@ const PatientManagement = () => {
                         selectedPatient={selectedPatient}
                     />
                 </>
-            }
+            )}
         </div>
-    )
+    );
 }
 
-export default PatientManagement
+export default PatientManagement;

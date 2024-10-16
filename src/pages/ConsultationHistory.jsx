@@ -62,7 +62,7 @@ function ConsultationHistory() {
       <Navbar />
       <div className="flex">
         <Sidebar />
-        <div className="flex-grow pl-[20rem] pr-[4rem]">
+        <div className="flex-grow pl-[20rem] pr-[4rem] pl-[80px] pr-5 md:pl-[20rem] md:pr-[4rem]">
           <div className="mt-10 px-8 lg:px-0">
             <h1 className="text-2xl font-bold text-[#384D6C] mb-4 underline pb-8">
               Consultation history
