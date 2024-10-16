@@ -9,116 +9,81 @@ import useTimeFrequencyFilter from "../components/TimeFrequencyFilter";
 import useFilterSearch from "../components/FilterSearch";
 
 const ConsultationManagement = () => {
-
     const [consultations, setConsultations] = useState([]);
-    const [TimeFrequencyFilter, timeFrequencyFilteredItems] = useTimeFrequencyFilter(consultations);
-    const [FilterSearch, filteredData] = useFilterSearch(consultations, ["date", "time"]);
-
     const [isArchivedList, setIsArchivedList] = useState(false);
 
-    const fetchList = url => {
+    // Custom hooks for filtering
+    const [TimeFrequencyFilter, timeFrequencyFilteredItems] = useTimeFrequencyFilter(consultations);
+    const [FilterSearch, filteredData] = useFilterSearch(timeFrequencyFilteredItems, ["date", "time"]);
+
+    // Fetch the consultations list from the server
+    const fetchList = (url) => {
         axiosClient
             .get(url)
-            .then(({ data }) => {
-                setConsultations(data);
-            })
-            .catch(
-                ({
-                    response: {
-                        data: { message },
-                    },
-                }) => {
-                    alert(message);
-                }
-            );
-    }
+            .then(({ data }) => setConsultations(data))
+            .catch((error) => alert(error?.response?.data?.message));
+    };
 
+    // Fetch list on component mount and when isArchivedList changes
     useEffect(() => {
-        fetchList("/consultations")
-    }, []);
-
-    useMemo(() => {
-        let url = "/consultations";
-
-        if (isArchivedList)
-            url = "/consultations/archive";
-
+        const url = isArchivedList ? "/consultations/archive" : "/consultations";
         fetchList(url);
-    }, [isArchivedList])
+    }, [isArchivedList]);
 
+    // Update consultation status
     const updateConsultationStatus = (id, status) => {
         axiosClient
             .put("/consultations/" + id, { status })
             .then(({ data: { message } }) => {
                 alert(message);
-                window.location.reload();
+                fetchList(isArchivedList ? "/consultations/archive" : "/consultations");
             })
-            .catch(
-                ({
-                    response: {
-                        data: { message },
-                    },
-                }) => {
-                    console.log(message);
-                }
-            );
-    }
+            .catch((error) => console.log(error?.response?.data?.message));
+    };
 
+    // Delete a consultation
     const deleteConsultation = (id) => {
-        if (confirm("Are you sure you want to delete this consultation?"))
+        if (confirm("Are you sure you want to delete this consultation?")) {
             axiosClient
                 .delete("/consultations/" + id)
                 .then(({ data: { message } }) => {
                     alert(message);
-                    window.location.reload();
+                    fetchList(isArchivedList ? "/consultations/archive" : "/consultations");
                 })
-                .catch(
-                    ({
-                        response: {
-                            data: { message },
-                        },
-                    }) => {
-                        console.log(message);
-                    }
-                );
-    }
+                .catch((error) => console.log(error?.response?.data?.message));
+        }
+    };
 
+    // Restore a consultation
     const restoreConsultation = (id) => {
-        if (confirm("Are you sure you want to restore this consultation?"))
+        if (confirm("Are you sure you want to restore this consultation?")) {
             axiosClient
                 .put("/consultations/restore/" + id)
                 .then(({ data: { message } }) => {
                     alert(message);
-                    window.location.reload();
+                    fetchList("/consultations/archive");
                 })
-                .catch(
-                    ({
-                        response: {
-                            data: { message },
-                        },
-                    }) => {
-                        console.log(message);
-                    }
-                );
-    }
+                .catch((error) => console.log(error?.response?.data?.message));
+        }
+    };
 
-    const toggleList = () => {
-        setIsArchivedList(!isArchivedList);
-    }
+    // Toggle between active and archived list
+    const toggleList = () => setIsArchivedList(!isArchivedList);
 
     const divRef = useRef();
     const handlePrint = () => {
         const input = divRef.current;
         const title = "Consultations Reports";
         printPage(input, title);
-    }
+    };
 
     return (
         <div className="px-16 py-8">
             <h1 className="text-5xl font-bold">Consultation</h1>
-            {consultations.length == 0 ?
+
+            {consultations.length === 0 ? (
                 <h2 className="text-2xl py-5 text-center">No data at the moment.</h2>
-                :
+            ) : (
                 <>
                     <div className="my-10">
                         <div className="flex justify-between items-end">
@@ -126,41 +91,33 @@ const ConsultationManagement = () => {
                                 {FilterSearch}
                                 {TimeFrequencyFilter}
                             </div>
-                                <div className="flex items-center gap-4 ml-auto">
+                            <div className="flex items-center gap-4 ml-auto">
                                 <PrintToPDFButton handlePrint={handlePrint} />
-                                <button onClick={toggleList} className="no-underline hover:underline text-blue-500 text-xl"> {isArchivedList ? "Consultation List" : "Archived"}</button>
-                                </div>
+                                <button
+                                    onClick={toggleList}
+                                    className="no-underline hover:underline text-blue-500 text-xl"
+                                >
+                                    {isArchivedList ? "Consultation List" : "Archived"}
+                                </button>
                             </div>
+                        </div>
+
                         <div className="relative overflow-x-auto shadow-md sm:rounded-lg border-2" ref={divRef}>
                             <table className="w-full text-sm text-left rtl:text-right text-gray-900 dark:text-gray-900">
                                 <thead className="bg-gray-200">
                                     <tr>
-                                        <th scope="col" className="px-6 py-3">
-                                            Name
-                                        </th>
-                                        <th scope="col" className="px-6 py-3">
-                                            Contact Number
-                                        </th>
-                                        <th scope="col" className="px-6 py-3">
-                                            Email
-                                        </th>
-                                        <th scope="col" className="px-6 py-3">
-                                            Time
-                                        </th>
-                                        <th scope="col" className="px-6 py-3">
-                                            Date
-                                        </th>
-                                        <th scope="col" className="px-6 py-3">
-                                            Status
-                                        </th>
-                                        <th scope="col" className="px-6 py-3">
-                                            Actions
-                                        </th>
+                                        <th scope="col" className="px-6 py-3">Name</th>
+                                        <th scope="col" className="px-6 py-3">Contact Number</th>
+                                        <th scope="col" className="px-6 py-3">Email</th>
+                                        <th scope="col" className="px-6 py-3">Time</th>
+                                        <th scope="col" className="px-6 py-3">Date</th>
+                                        <th scope="col" className="px-6 py-3">Status</th>
+                                        <th scope="col" className="px-6 py-3">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {filteredData.map((consultation, index) => (
-                                        <tr key={index} className="bg-white  dark:border-gray-700">
+                                        <tr key={index} className="bg-white dark:border-gray-700">
                                             <td className="px-6 py-4">
                                                 <MdEventNote className="mr-2 text-xl inline" />
                                                 {consultation.name}
@@ -171,43 +128,48 @@ const ConsultationManagement = () => {
                                             <td className="px-6 py-4">{consultation.date}</td>
                                             <td className="px-6 py-4">{consultation.status}</td>
                                             <td className="px-6 py-4">
-                                                {
-                                                    isArchivedList ?
-                                                        <button
-                                                            onClick={() => restoreConsultation(consultation._id)}
-                                                            className="mr-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full"
-                                                        >
-                                                            Restore
-                                                        </button> : null
-                                                }
-
-                                                {consultation.status == ConsultationStatus.PENDING ?
+                                                {isArchivedList ? (
+                                                    <button
+                                                        onClick={() => restoreConsultation(consultation._id)}
+                                                        className="mr-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full"
+                                                    >
+                                                        Restore
+                                                    </button>
+                                                ) : consultation.status === ConsultationStatus.PENDING ? (
                                                     <>
                                                         <button
-                                                            onClick={() => updateConsultationStatus(consultation._id, "CONFIRMED")}
+                                                            onClick={() =>
+                                                                updateConsultationStatus(consultation._id, "CONFIRMED")
+                                                            }
                                                             className="mr-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full"
                                                         >
                                                             Confirm
                                                         </button>
                                                         <button
-                                                            onClick={() => updateConsultationStatus(consultation._id, "CANCELED")}
+                                                            onClick={() =>
+                                                                updateConsultationStatus(consultation._id, "CANCELED")
+                                                            }
                                                             className="mr-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full"
                                                         >
                                                             Cancel
                                                         </button>
                                                         <button
-                                                            onClick={() => updateConsultationStatus(consultation._id, "FULLY BOOKED")}
+                                                            onClick={() =>
+                                                                updateConsultationStatus(consultation._id, "FULLY BOOKED")
+                                                            }
                                                             className="bg-[#FAB005] hover:bg-[#fab005da] text-white font-bold py-2 px-4 rounded-full"
                                                         >
                                                             Full
                                                         </button>
-                                                    </> :
+                                                    </>
+                                                ) : (
                                                     <button
                                                         onClick={() => deleteConsultation(consultation._id)}
                                                         className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full"
                                                     >
                                                         Delete
-                                                    </button>}
+                                                    </button>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}
@@ -215,14 +177,12 @@ const ConsultationManagement = () => {
                             </table>
                         </div>
                     </div>
-
-                
                 </>
-            }
+            )}
 
             <ConsultationSlot />
         </div>
-    )
-}
+    );
+};
 
-export default ConsultationManagement
+export default ConsultationManagement;
