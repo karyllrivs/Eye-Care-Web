@@ -133,8 +133,8 @@ const VirtualTryOn = () => {
                 const scaleMultiplier = eyeDistance / 140;
 
                 // Glasses scaling and offset values
-                const scaleX = -0.01;
-                const scaleY = -0.01;
+                const scaleX = -0.01;   // left of right sensitivity
+                const scaleY = -0.01;   // glass height
                 const offsetX = 0.00;
                 const offsetY = -0.01;
 

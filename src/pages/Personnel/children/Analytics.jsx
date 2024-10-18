@@ -130,7 +130,10 @@ const Analytics = () => {
 
     return (
         <div className="px-16 py-8">
-            <h1 className="text-5xl font-bold">Analytics</h1>
+            <h1 className="text-5xl font-bold">
+  Analytics {new Date().getFullYear()}
+</h1>
+
 
             <div className="my-10">
                 <button onClick={() => setTimeFilter("daily")} className={`px-4 py-2 mr-2 rounded ${timeFilter === "daily" ? "bg-blue-500 text-white" : "bg-gray-200"}`}>Daily</button>
