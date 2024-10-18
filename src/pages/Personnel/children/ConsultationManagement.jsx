@@ -94,11 +94,13 @@ const ConsultationManagement = () => {
                             <div className="flex items-center gap-4 ml-auto">
                                 <PrintToPDFButton handlePrint={handlePrint} />
                                 <button
-                                    onClick={toggleList}
-                                    className="no-underline hover:underline text-blue-500 text-xl"
-                                >
-                                    {isArchivedList ? "Consultation List" : "Archived"}
-                                </button>
+                                onClick={toggleList}
+                                className={`text-white font-bold py-2 px-5 rounded-full transition duration-300 ${
+                                isArchivedList ? "bg-yellow-500 hover:bg-yellow-600" : "bg-blue-500 hover:bg-blue-600"
+                            }`}
+                            >
+                                {isArchivedList ? "Consultation List" : "Archives"}
+                            </button>
                             </div>
                         </div>
 
