@@ -9,11 +9,9 @@ import { getFile } from "../utils/serverFileUtils";
 import AddRatingModal from "../components/AddRatingModal";
 
 const OrderHistory = () => {
-
   const [orders, setOrders] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState("");
   const currentUser = useSelector(selectCurrentUser);
-
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   useEffect(() => {
@@ -22,7 +20,9 @@ const OrderHistory = () => {
     axiosClient
       .get("/orders/" + _id)
       .then(({ data }) => {
-        setOrders(data);
+        // Sort orders by delivered_on date (latest first)
+        const sortedOrders = data.sort((a, b) => new Date(b.delivered_on) - new Date(a.delivered_on));
+        setOrders(sortedOrders);
       })
       .catch(
         ({
@@ -110,36 +110,34 @@ const OrderHistory = () => {
                   {orders.map((order) => (
                     <tr key={order._id}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-
-
-                        
                         {order._id.toUpperCase()}
-                        
                         <img src={getFile(order.image)} alt="Glasses" className="h-8 lg:hidden" />
-                        <br/>
-                        <span className=" lg:hidden">
-                        Ordered On: {order.delivered_on}
+                        <br />
+                        <span className="lg:hidden">
+                          Ordered On: {order.delivered_on}
                         </span>
-                        <br/>
-
+                        <br />
                         <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full lg:hidden ${order.status === "Delivered"
-                            ? "bg-green-100 text-green-800"
-                            : order.status === "Pending"
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full lg:hidden ${
+                            order.status === "Delivered"
+                              ? "bg-green-100 text-green-800"
+                              : order.status === "Pending"
                               ? "bg-yellow-100 text-yellow-800"
-                              : order.status === "Confirmed" ? "bg-blue-100 text-blue-800" : "bg-red-100 text-red-800"
-                            }`}
-                        >Status: {order.status}</span>
-                          <br/>
-                            <span className=" lg:hidden">
-                            Quantity: {order.quantity}
-                            </span>
-                            <br />
-                          <span className=" lg:hidden">  
+                              : order.status === "Confirmed"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          Status: {order.status}
+                        </span>
+                        <br />
+                        <span className="lg:hidden">
+                          Quantity: {order.quantity}
+                        </span>
+                        <br />
+                        <span className="lg:hidden">
                           Total: ₱{order.total}
-                          </span>
-
-
+                        </span>
                       </td>
 
                       <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
@@ -151,12 +149,15 @@ const OrderHistory = () => {
 
                       <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                         <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${order.status === "Delivered"
-                            ? "bg-green-100 text-green-800"
-                            : order.status === "Pending"
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            order.status === "Delivered"
+                              ? "bg-green-100 text-green-800"
+                              : order.status === "Pending"
                               ? "bg-yellow-100 text-yellow-800"
-                              : order.status === "Confirmed" ? "bg-blue-100 text-blue-800" : "bg-red-100 text-red-800"
-                            }`}
+                              : order.status === "Confirmed"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
                         >
                           {order.status}
                         </span>
@@ -172,7 +173,8 @@ const OrderHistory = () => {
                         <button
                           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                           onClick={() => handleOpenModal(order.product_id)}
-                          type="button">
+                          type="button"
+                        >
                           Add Review
                         </button>
                       </td>

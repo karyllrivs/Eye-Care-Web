@@ -12,13 +12,14 @@ function ConsultationHistory() {
   const currentUser = useSelector(selectCurrentUser);
 
   useEffect(() => {
-
     const { _id } = currentUser;
 
     axiosClient
       .get("/consultations/" + _id)
       .then(({ data }) => {
-        setConsultations(data);
+        // Sort consultations by date in descending order
+        const sortedConsultations = data.sort((a, b) => new Date(b.date) - new Date(a.date));
+        setConsultations(sortedConsultations);
       })
       .catch(
         ({
