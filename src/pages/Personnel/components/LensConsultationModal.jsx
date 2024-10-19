@@ -55,6 +55,16 @@ const AddOptions = <>
     {adds.map((add, id) => <option key={id} value={add}>{add}</option>)}
 </>;
 
+const generateTimeOptions = () => {
+    const times = [];
+    for (let hour = 2; hour <= 7; hour++) { 
+        for (let minute = 0; minute < 60; minute += 30) { // 30 minutes interval
+            const time = `${hour.toString().padStart(2)}:${minute.toString().padStart(2, '0')}`;
+            times.push(time);
+        }
+    }
+    return times;
+};
 
 const LensConsultationModal = ({ handleCloseModal, isModalVisible, selectedPatient }) => {
 
@@ -64,6 +74,7 @@ const LensConsultationModal = ({ handleCloseModal, isModalVisible, selectedPatie
 
     const [patients, setPatients] = useState([]);
 
+    const timeOptions = generateTimeOptions(); // Generate time options
 
     useMemo(() => {
         if (selectedPatient._id)
@@ -136,7 +147,10 @@ const LensConsultationModal = ({ handleCloseModal, isModalVisible, selectedPatie
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-            <form onSubmit={handleSubmit} className="max-w-6xl mx-auto p-4 bg-white shadow-md rounded">
+            <form
+                onSubmit={handleSubmit}
+                className="w-full max-w-5xl max-h-[80vh] overflow-y-auto p-2 md:p-4 bg-white shadow-md rounded"
+            >
                 <h2 className="text-2xl font-bold mb-4">Patient Visit Details</h2>
                 {error && <p className="text-red-500 text-sm">{error}</p>}
                 <div className="grid grid-cols-4 gap-4">
@@ -197,14 +211,17 @@ const LensConsultationModal = ({ handleCloseModal, isModalVisible, selectedPatie
                         className="mb-2 p-2 w-full border rounded"
                 />
 
-
-                            <input
-                                type="time"
+                            <select
                                 name="consultationTime"
                                 value={formData.consultationTime}
                                 onChange={handleChange}
                                 className="mb-2 p-2 w-full border rounded"
-                            />
+                            >
+                                <option value="" hidden>Select Time</option>
+                                {timeOptions.map((time, id) => (
+                                    <option key={id} value={time}>{time}</option>
+                                ))}
+                            </select>
                         </div>
                     </div>
 
