@@ -71,21 +71,18 @@ const OrderHistory = () => {
                     >
                       Image
                     </th>
-
                     <th
                       scope="col"
                       className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
                     >
                       Ordered On
                     </th>
-
                     <th
                       scope="col"
                       className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
                     >
                       Status
                     </th>
-
                     <th
                       scope="col"
                       className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
@@ -139,14 +136,12 @@ const OrderHistory = () => {
                           Total: ₱{order.total}
                         </span>
                       </td>
-
                       <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                         <img src={getFile(order.image)} alt="Glasses" className="h-8" />
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">
                         {order.delivered_on}
                       </td>
-
                       <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                         <span
                           className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -162,7 +157,6 @@ const OrderHistory = () => {
                           {order.status}
                         </span>
                       </td>
-
                       <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                         {order.quantity}
                       </td>
@@ -174,6 +168,7 @@ const OrderHistory = () => {
                           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                           onClick={() => handleOpenModal(order.product_id)}
                           type="button"
+                          disabled={order.status !== "Delivered"} // Disable button if status is not delivered
                         >
                           Add Review
                         </button>
