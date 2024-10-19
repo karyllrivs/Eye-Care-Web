@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import axiosClient from "../../../utils/axiosClient";
 import { HiOutlineUser } from "react-icons/hi";
+import { AiOutlineSearch } from "react-icons/ai"; // Import the search icon
 import AccountModal from "../components/AccountModal";
 import PrintToPDFButton from "../components/PrintToPDFButton";
 import { printPage } from "../../../utils/printPage";
@@ -67,21 +68,23 @@ const AccountManagement = () => {
             ) : (
                 <>
                     <div className="my-10">
-                        <div className="flex gap-2">
-                            {/* Search Input Field */}
-                            <input
-                                type="text"
-                                placeholder="Search by name"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="px-4 border border-gray-300 rounded-lg bg-white text-gray-600 text-sm h-12 w-60 p-3"
-                            />
+                        <div className="flex gap-2 items-center">
+                            {/* Search Input Field with Icon */}
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Search by name"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="px-4 border border-gray-300 rounded-lg bg-white text-gray-600 text-sm h-12 w-50 pl-10" // Add padding to left for icon
+                                />
+                                <AiOutlineSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" /> {/* Position the icon */}
+                            </div>
 
                             <div className="ml-auto">
                                 <PrintToPDFButton handlePrint={handlePrint} />
                                 <br></br>
                             </div>
-                            
                         </div>
 
                         <div className="relative overflow-x-auto shadow-md sm:rounded-lg" ref={divRef}>
