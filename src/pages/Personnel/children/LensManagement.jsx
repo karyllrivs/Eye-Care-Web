@@ -6,13 +6,11 @@ import { formatDateToLong, formatTimeToAMPM } from "../../../utils/formatter";
 import { getPatientsWithLensConsultation } from "../../../utils/filterPatient";
 import { printPage } from "../../../utils/printPage";
 import PrintToPDFButton from "../components/PrintToPDFButton";
-import useTimeFrequencyFilter from "../components/TimeFrequencyFilter";
 import useFilterSearch from "../components/FilterSearch";
 
 const LensManagement = () => {
 
     const [patients, setPatients] = useState([]);
-    const [TimeFrequencyFilter, timeFrequencyFilteredItems] = useTimeFrequencyFilter(patients);
     const [FilterSearch, filteredData] = useFilterSearch(patients, ["name"]);
 
     useEffect(() => {
@@ -75,8 +73,7 @@ const LensManagement = () => {
                     <div className="my-10">
                         <div className="flex gap-2">
                             {FilterSearch}
-                            {TimeFrequencyFilter}
-
+                         
                             <div className="ml-auto">
                                 <PrintToPDFButton handlePrint={handlePrint} />
                             </div>

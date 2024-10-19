@@ -4,13 +4,11 @@ import { formatDateToLong } from "../../../utils/formatter";
 import OrderModal from "../components/OrderModal";
 import { printPage } from "../../../utils/printPage";
 import PrintToPDFButton from "../components/PrintToPDFButton";
-import useTimeFrequencyFilter from "../components/TimeFrequencyFilter";
 import useFilterSearch from "../components/FilterSearch";
 
 const OrderManagement = () => {
 
     const [checkouts, setCheckouts] = useState([]);
-    const [TimeFrequencyFilter, timeFrequencyFilteredItems] = useTimeFrequencyFilter(checkouts);
     const [FilterSearch, filteredData] = useFilterSearch(checkouts, ["checkout_id"]);
 
 
@@ -60,7 +58,6 @@ const OrderManagement = () => {
                     <div className="my-10">
                         <div className="flex gap-2">
                             {FilterSearch}
-                            {TimeFrequencyFilter}
                             <div className="ml-auto">
                                 <PrintToPDFButton handlePrint={handlePrint} />
                             </div>
