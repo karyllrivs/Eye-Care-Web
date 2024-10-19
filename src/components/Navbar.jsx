@@ -14,39 +14,34 @@ import { useSelector } from "react-redux";
 import { selectCartCount } from "../redux/cart/cart.selector";
 
 const Navbar = () => {
-  const [categories, setCategories] = useState(null);
+  const [categories, setCategories] = useState([]);
   const cartCount = useSelector(selectCartCount);
-
-  useEffect(() => {
-    axiosClient
-      .get("/categories/")
-      .then(({ data }) => {
-        setCategories(data);
-      })
-      .catch(
-        ({
-          response: {
-            data: { message },
-          },
-        }) => {
-          alert(message);
-        }
-      );
-  }, [])
-
   const [navbar, setNavbar] = useState(false);
-
-  // Search Features
   const navigate = useNavigate();
   const [keyword, setKeyword] = useState("");
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data } = await axiosClient.get("/categories/");
+        const filteredData = data.filter(category => category.name !== "Eye Glasses");
+        setCategories(filteredData);
+      } catch ({ response: { data: { message } } }) {
+        alert(message);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-
     navigate("/search/" + keyword);
-  }
+  };
+
   const handleChangeSearchInput = (e) => {
     setKeyword(e.target.value);
-  }
+  };
 
   return (
     <nav
@@ -93,7 +88,7 @@ const Navbar = () => {
                 Home
               </Link>
             </li>
-            {categories && categories.map(({ _id, name, isInNavbar }) => isInNavbar && (
+            {categories.map(({ _id, name, isInNavbar }) => isInNavbar && (
               <li key={_id}>
                 <Link
                   to={"/category/" + _id}
@@ -103,7 +98,7 @@ const Navbar = () => {
                 </Link>
               </li>
             ))}
-            <li >
+            <li>
               <Link
                 to="/consultation"
                 className="text-[#253D4E] text-[.95rem] font-bold tracking-wider hover:text-[#00C0FF] ease-out duration-300 py-2"
