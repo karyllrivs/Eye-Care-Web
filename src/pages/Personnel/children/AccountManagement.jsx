@@ -2,14 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import axiosClient from "../../../utils/axiosClient";
 import { HiOutlineUser } from "react-icons/hi";
 import AccountModal from "../components/AccountModal";
-import useTimeFrequencyFilter from "../components/TimeFrequencyFilter";
 import PrintToPDFButton from "../components/PrintToPDFButton";
 import { printPage } from "../../../utils/printPage";
 
 const AccountManagement = () => {
-
     const [accounts, setAccounts] = useState([]);
-    const [TimeFrequencyFilter, timeFrequencyFilteredItems] = useTimeFrequencyFilter(accounts);
+    const [searchTerm, setSearchTerm] = useState(""); // State for search term
 
     /** MODAL */
     const [selectedAccount, setSelectedAccount] = useState({});
@@ -48,7 +46,12 @@ const AccountManagement = () => {
         const input = divRef.current;
         const title = "Account Reports";
         printPage(input, title);
-    }
+    };
+
+    // Filtered accounts based on the search term
+    const filteredAccounts = accounts.filter((account) =>
+        account.profile.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <div className="px-16 py-8">
@@ -59,16 +62,24 @@ const AccountManagement = () => {
                 </button>
             </div>
 
-            {accounts.length == 0 ?
+            {accounts.length === 0 ? (
                 <h2 className="text-2xl py-5">No data at the moment.</h2>
-                :
+            ) : (
                 <>
                     <div className="my-10">
                         <div className="flex gap-2">
-                            {TimeFrequencyFilter}
-                            
+                            {/* Search Input Field */}
+                            <input
+                                type="text"
+                                placeholder="Search by name"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="px-4 border border-gray-300 rounded-lg bg-white text-gray-600 text-sm h-12 w-60 p-3"
+                            />
+
                             <div className="ml-auto">
                                 <PrintToPDFButton handlePrint={handlePrint} />
+                                <br></br>
                             </div>
                             
                         </div>
@@ -104,55 +115,50 @@ const AccountManagement = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-    {/** Changed currentItems.map to timeFrequencyFilteredItems.map */}
-    {timeFrequencyFilteredItems.map((account, index) => (
-        <tr key={index} className="bg-white dark:border-gray-700">
-            <td className="px-6 py-4">
-                <HiOutlineUser className="mr-2 text-xl inline" />
-                {account.profile.name}
-            </td>
-            <td className="px-6 py-4">
-                {account.profile.gender}
-            </td>
-            <td className="px-6 py-4">
-                {account.profile.birthday}
-            </td>
-            <td className="px-6 py-4">
-                {account.profile.age}
-            </td>
-            <td className="px-6 py-4">
-                {account.profile.mobile}
-            </td>
-            <td className="px-6 py-4">
-                {account.profile.address}
-            </td>
-            <td className="px-6 py-4">
-                {account.role}
-            </td>
-            <td className="px-6 py-4">
-                <button
-                    className="mr-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full"
-                    onClick={() => handleOpenEditModal(account)}
-                >
-                    Edit
-                </button>
-            </td>
-        </tr>
-    ))}
-</tbody>
-
+                                    {filteredAccounts.map((account, index) => (
+                                        <tr key={index} className="bg-white dark:border-gray-700">
+                                            <td className="px-6 py-4">
+                                                <HiOutlineUser className="mr-2 text-xl inline" />
+                                                {account.profile.name}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {account.profile.gender}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {account.profile.birthday}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {account.profile.age}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {account.profile.mobile}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {account.profile.address}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {account.role}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <button
+                                                    className="mr-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full"
+                                                    onClick={() => handleOpenEditModal(account)}
+                                                >
+                                                    Edit
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
                             </table>
                         </div>
                     </div>
 
-
                     <div className="flex justify-between">
                         <PrintToPDFButton handlePrint={handlePrint} />
-
                     </div>
-
                 </>
-            }
+            )}
 
             {/* MODAL */}
             <AccountModal
@@ -162,7 +168,7 @@ const AccountManagement = () => {
                 isSuperAdmin={true}
             />
         </div>
-    )
-}
+    );
+};
 
-export default AccountManagement
+export default AccountManagement;
