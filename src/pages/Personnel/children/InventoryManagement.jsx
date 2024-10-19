@@ -42,27 +42,30 @@ const InventoryManagement = () => {
     };
 
     // Fetch products and categories
-    useEffect(() => {
-        axiosClient
-            .get("/products")
-            .then(({ data }) => {
-                setProducts(data);
-                const uniqueCategories = [
-                    "All Categories",
-                    ...new Set(data.map((product) => product.category_name)),
-                ];
-                setCategories(uniqueCategories); // Set unique categories
-            })
-            .catch(
-                ({
-                    response: {
-                        data: { message },
-                    },
-                }) => {
-                    alert(message);
-                }
-            );
-    }, []);
+useEffect(() => {
+    axiosClient
+        .get("/products")
+        .then(({ data }) => {
+            setProducts(data);
+            const uniqueCategories = [
+                "All Categories",
+                ...new Set(data
+                    .map((product) => product.category_name)
+                    .filter(category => category !== "contact lenses and solution")), // Exclude the unwanted category
+            ];
+            setCategories(uniqueCategories); // Set unique categories
+        })
+        .catch(
+            ({
+                response: {
+                    data: { message },
+                },
+            }) => {
+                alert(message);
+            }
+        );
+}, []);
+
 
     const divRef = useRef();
     const handlePrint = () => {

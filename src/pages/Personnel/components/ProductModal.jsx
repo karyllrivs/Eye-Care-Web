@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import axiosClient from "../../../utils/axiosClient";
 import { getFile } from "../../../utils/serverFileUtils";
 
-
 const emptyFields = {
     _id: "",
     category_id: "",
@@ -12,14 +11,17 @@ const emptyFields = {
     description: "",
     price: "",
     stock: "",
+    brand: "", // Added brand field to emptyFields
 };
 
 const ProductModal = ({ handleCloseModal, isModalVisible, selectedProduct }) => {
-
     const [formFields, setFormFields] = useState(emptyFields);
     const [error, setError] = useState("");
-
     const [categories, setCategories] = useState([]);
+    
+    // Define the brands array
+    const brands = ["Dazzle", "Giordano", "Hangten"];
+
     useEffect(() => {
         axiosClient
             .get("/categories/")
@@ -41,13 +43,13 @@ const ProductModal = ({ handleCloseModal, isModalVisible, selectedProduct }) => 
         if (selectedProduct._id)
             setFormFields(selectedProduct);
         else
-            setFormFields(emptyFields)
-    }, [selectedProduct])
+            setFormFields(emptyFields);
+    }, [selectedProduct]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        if (name == "category_id") {
-            const category_name = categories.find((category) => category._id == value).name;
+        if (name === "category_id") {
+            const category_name = categories.find((category) => category._id === value).name;
             setFormFields({
                 ...formFields,
                 category_name,
@@ -59,13 +61,12 @@ const ProductModal = ({ handleCloseModal, isModalVisible, selectedProduct }) => 
                 [name]: value,
             });
         }
-    }
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if (formFields._id)
-
+        if (formFields._id) {
             axiosClient
                 .put("/products/" + selectedProduct._id, formFields, {
                     headers: {
@@ -85,9 +86,7 @@ const ProductModal = ({ handleCloseModal, isModalVisible, selectedProduct }) => 
                         setError(message);
                     }
                 );
-
-        else
-
+        } else {
             axiosClient
                 .post("/products", formFields, {
                     headers: {
@@ -107,7 +106,8 @@ const ProductModal = ({ handleCloseModal, isModalVisible, selectedProduct }) => 
                         setError(message);
                     }
                 );
-    }
+        }
+    };
 
     const loadImage = (event) => {
         let reader = new FileReader();
@@ -121,8 +121,7 @@ const ProductModal = ({ handleCloseModal, isModalVisible, selectedProduct }) => 
             ...formFields,
             image: event.target.files[0]
         });
-    }
-
+    };
 
     const deleteProduct = (id) => {
         if (confirm("Are you sure you want to delete this product?"))
@@ -141,12 +140,9 @@ const ProductModal = ({ handleCloseModal, isModalVisible, selectedProduct }) => 
                         console.error(message);
                     }
                 );
-    }
+    };
 
-    if (!isModalVisible)
-        return null;
-
-
+    if (!isModalVisible) return null;
 
     const {
         _id,
@@ -155,7 +151,9 @@ const ProductModal = ({ handleCloseModal, isModalVisible, selectedProduct }) => 
         image,
         description,
         price,
-        stock, } = formFields;
+        stock,
+        brand, // Added brand field
+    } = formFields;
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
@@ -225,7 +223,26 @@ const ProductModal = ({ handleCloseModal, isModalVisible, selectedProduct }) => 
                                 onChange={handleChange}
                                 value={category_id}
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2" >
-                                {categories.map((category) => <option key={category._id} value={category._id}>{category.name}</option>)}
+                                {categories.map((category) => (
+                                    <option key={category._id} value={category._id}>{category.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="flex-1">
+                            <label className="block text-sm font-semibold text-gray-700">
+                                Brand
+                            </label>
+                            <select
+                                id="brand"
+                                name="brand"
+                                onChange={handleChange}
+                                value={brand} // Bind the brand field
+                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2">
+                                <option value="">Select a brand</option>
+                                {brands.map((brandName, index) => (
+                                    <option key={index} value={brandName}>{brandName}</option>
+                                ))}
                             </select>
                         </div>
 
@@ -238,7 +255,6 @@ const ProductModal = ({ handleCloseModal, isModalVisible, selectedProduct }) => 
                                 onChange={loadImage}
                                 accept="image/*"
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
-
                             />
                             <div className="mt-2 flex flex-wrap">
                                 <img
