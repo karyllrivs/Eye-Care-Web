@@ -4,12 +4,10 @@ import axiosClient from "../../../utils/axiosClient";
 import PatientModal from "../components/PatientModal";
 import { printPage } from "../../../utils/printPage";
 import PrintToPDFButton from "../components/PrintToPDFButton";
-import useTimeFrequencyFilter from "../components/TimeFrequencyFilter";
 import useFilterSearch from "../components/FilterSearch.jsx";
 
 const PatientManagement = () => {
     const [patients, setPatients] = useState([]);
-    const [TimeFrequencyFilter, timeFrequencyFilteredItems] = useTimeFrequencyFilter(patients);
     const [FilterSearch, filteredData] = useFilterSearch(patients, ["name", "email", "mobile", "address", "age", "birthday", "gender"]);
 
     /** MODAL */
@@ -64,14 +62,13 @@ const PatientManagement = () => {
                     <div className="my-10">
                         <div className="flex gap-2 flex-wrap"> {/* Added flex-wrap for better layout on smaller screens */}
                             {FilterSearch}
-                            {TimeFrequencyFilter}
                             <div className="ml-auto">
                                 <PrintToPDFButton handlePrint={handlePrint} />
                             </div>
                         </div>
 
                         <div className="relative overflow-x-auto shadow-md sm:rounded-lg" ref={divRef}>
-                            <table className="min-w-full text-sm text-left rtl:text-right text-gray-900 dark:text-gray-900">
+                            <table className="min-w-full text-xs text-left rtl:text-right text-gray-900 dark:text-gray-900">
                                 <thead className="bg-gray-200">
                                     <tr>
                                         <th scope="col" className="px-6 py-3">Name</th>
