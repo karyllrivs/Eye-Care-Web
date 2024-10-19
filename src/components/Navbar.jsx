@@ -6,7 +6,7 @@ import {
   FaShoppingCart,
   FaSearch,
 } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom"; // Import useLocation
 import Logo from "../assets/Logo2.png";
 import BackgroundImage from "../assets/background.png";
 import axiosClient from "../utils/axiosClient";
@@ -18,6 +18,7 @@ const Navbar = () => {
   const cartCount = useSelector(selectCartCount);
   const [navbar, setNavbar] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation(); // Get the current location
   const [keyword, setKeyword] = useState("");
 
   useEffect(() => {
@@ -83,7 +84,7 @@ const Navbar = () => {
             <li>
               <Link
                 to="/"
-                className="text-[#253D4E] text-[.95rem] font-bold tracking-wider hover:text-[#00C0FF] ease-out duration-300 py-2"
+                className={`text-[#253D4E] text-[.95rem] font-bold tracking-wider hover:text-[#00C0FF] ease-out duration-300 py-2 ${location.pathname === '/' ? 'text-[#00C0FF]' : ''}`}
               >
                 Home
               </Link>
@@ -92,7 +93,7 @@ const Navbar = () => {
               <li key={_id}>
                 <Link
                   to={"/category/" + _id}
-                  className="text-[#253D4E] text-[.95rem] font-bold tracking-wider hover:text-[#00C0FF] ease-out duration-300 py-2"
+                  className={`text-[#253D4E] text-[.95rem] font-bold tracking-wider hover:text-[#00C0FF] ease-out duration-300 py-2 ${location.pathname === '/category/' + _id ? 'text-[#00C0FF]' : ''}`}
                 >
                   {name}
                 </Link>
@@ -101,7 +102,7 @@ const Navbar = () => {
             <li>
               <Link
                 to="/consultation"
-                className="text-[#253D4E] text-[.95rem] font-bold tracking-wider hover:text-[#00C0FF] ease-out duration-300 py-2"
+                className={`text-[#253D4E] text-[.95rem] font-bold tracking-wider hover:text-[#00C0FF] ease-out duration-300 py-2 ${location.pathname === '/consultation' ? 'text-[#00C0FF]' : ''}`}
               >
                 Consultation
               </Link>
@@ -123,7 +124,7 @@ const Navbar = () => {
             <li className="flex items-center relative">
               <Link
                 to="/cart"
-                className="flex items-center text-[#253D4E] text-[.95rem] font-bold tracking-wider hover:text-[#00C0FF] ease-out duration-300 py-2"
+                className={`flex items-center text-[#253D4E] text-[.95rem] font-bold tracking-wider hover:text-[#00C0FF] ease-out duration-300 py-2 ${location.pathname === '/cart' ? 'text-[#00C0FF]' : ''}`}
               >
                 <FaShoppingCart className="mr-2 h-6 w-6" />
                 Cart
@@ -137,7 +138,7 @@ const Navbar = () => {
             <li className="flex items-center">
               <Link
                 to="/profile"
-                className="flex items-center text-[#253D4E] text-[.95rem] font-bold tracking-wider hover:text-[#00C0FF] ease-out duration-300 py-2"
+                className={`flex items-center text-[#253D4E] text-[.95rem] font-bold tracking-wider hover:text-[#00C0FF] ease-out duration-300 py-2 ${location.pathname === '/profile' ? 'text-[#00C0FF]' : ''}`}
               >
                 <FaUser className="mr-2 h-6 w-6" />
                 Profile
