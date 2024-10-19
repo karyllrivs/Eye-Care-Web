@@ -13,11 +13,8 @@ const InventoryManagement = () => {
     // Apply search filter on the items
     const [FilterSearch, filteredData] = useFilterSearch(products, ["name"]);
 
-    const [categories, setCategories] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState("All Categories");
-
-    const [brands, setBrands] = useState(["All Brands", "Dazzle", "Giordano", "Hangten"]);
-    const [selectedBrand, setSelectedBrand] = useState("All Brands");
+    const [categories, setCategories] = useState([]); // State to store categories
+    const [selectedCategory, setSelectedCategory] = useState("All Categories"); // State to manage selected category
 
     /** PRODUCT MODAL */
     const [selectedProduct, setSelectedProduct] = useState({});
@@ -49,17 +46,22 @@ const InventoryManagement = () => {
         axiosClient
             .get("/products")
             .then(({ data }) => {
-                console.log(data); // Log products data
                 setProducts(data);
                 const uniqueCategories = [
                     "All Categories",
                     ...new Set(data.map((product) => product.category_name)),
                 ];
-                setCategories(uniqueCategories);
+                setCategories(uniqueCategories); // Set unique categories
             })
-            .catch(({ response: { data: { message } } }) => {
-                alert(message);
-            });
+            .catch(
+                ({
+                    response: {
+                        data: { message },
+                    },
+                }) => {
+                    alert(message);
+                }
+            );
     }, []);
 
     const divRef = useRef();
@@ -69,25 +71,11 @@ const InventoryManagement = () => {
         printPage(input, title);
     };
 
-    // Filter products based on the selected category and brand
+    // Filter products based on the selected category
     const filteredByCategory =
         selectedCategory === "All Categories"
             ? filteredData
             : filteredData.filter((product) => product.category_name === selectedCategory);
-
-    const filteredByBrand =
-        selectedBrand === "All Brands"
-            ? filteredByCategory
-            : filteredByCategory.filter((product) => {
-                  // Check if product.brand exists before trimming and comparing
-                  if (!product.brand) {
-                      console.log("Product without brand:", product); // Log products without a brand
-                      return false; // Exclude products without a brand
-                  }
-                  // Extract brand from product name if applicable (modify this logic based on how brands are represented in product names)
-                  const brandFromName = product.name.split(" ")[0]; // Example: Assuming brand is the first word in the name
-                  return brandFromName.trim().toLowerCase() === selectedBrand.trim().toLowerCase();
-              });
 
     return (
         <div className="px-16 py-8">
@@ -100,12 +88,12 @@ const InventoryManagement = () => {
                     Add Product
                 </button>
             </div>
-            {products.length === 0 ? (
+            {products.length == 0 ? (
                 <h2 className="text-2xl py-5">No data at the moment.</h2>
             ) : (
                 <>
                     <div className="my-10">
-                        <div className="flex gap-2 items-center">
+                        <div className="flex gap-2 items-center"> {/* Aligning with search bar */}
                             {/* Search Bar */}
                             {FilterSearch}
 
@@ -115,29 +103,12 @@ const InventoryManagement = () => {
                                     id="category-select"
                                     value={selectedCategory}
                                     onChange={(e) => setSelectedCategory(e.target.value)}
-                                    className="p-2 border border-gray-300 rounded-lg bg-white text-gray-600 text-sm"
-                                    style={{ height: '46px' }}
+                                    className="p-2 border border-gray-300 rounded-lg bg-white text-gray-600 text-sm"   // Adjust font style here
+                                    style={{ height: '46px' }}  // Adjusting height to match the search bar
                                 >
                                     {categories.map((category, index) => (
                                         <option key={index} value={category}>
                                             {category}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* Brand Selection */}
-                            <div className="flex items-center">
-                                <select
-                                    id="brand-select"
-                                    value={selectedBrand}
-                                    onChange={(e) => setSelectedBrand(e.target.value)}
-                                    className="p-2 border border-gray-300 rounded-lg bg-white text-gray-600 text-sm"
-                                    style={{ height: '46px' }}
-                                >
-                                    {brands.map((brand, index) => (
-                                        <option key={index} value={brand}>
-                                            {brand}
                                         </option>
                                     ))}
                                 </select>
@@ -155,7 +126,6 @@ const InventoryManagement = () => {
                                         <th scope="col" className="px-6 py-3">Image</th>
                                         <th scope="col" className="px-6 py-3">Name</th>
                                         <th scope="col" className="px-6 py-3">Category</th>
-                                        <th scope="col" className="px-6 py-3">Brand</th>
                                         <th scope="col" className="px-6 py-3">Description</th>
                                         <th scope="col" className="px-6 py-3">Price</th>
                                         <th scope="col" className="px-6 py-3">Stock</th>
@@ -163,14 +133,13 @@ const InventoryManagement = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredByBrand.map((product, index) => (
-                                        <tr key={index} className="bg-white dark:border-gray-700">
+                                    {filteredByCategory.map((product, index) => (
+                                        <tr key={index} className="bg-white  dark:border-gray-700">
                                             <td className="px-6 py-4">
                                                 <img className="h-28 w-28 mr-4" src={getFile(product.image)} alt="" />
                                             </td>
                                             <td className="px-6 py-4">{product.name}</td>
                                             <td className="px-6 py-4">{product.category_name}</td>
-                                            <td className="px-6 py-4">{product.brand || "N/A"}</td>
                                             <td className="px-6 py-4">{product.description}</td>
                                             <td className="px-6 py-4">₱{product.price}</td>
                                             <td className="px-6 py-4">{product.stock}</td>
@@ -202,10 +171,10 @@ const InventoryManagement = () => {
                         selectedProduct={selectedProduct}
                     />
 
-                    {/* Virtual Try-On Modal */}
+                    {/* Virtual Try On Modal */}
                     <VirtualTryOnModal
-                        handleCloseModal={handleCloseVTOModal}
-                        isModalVisible={isVTOModalVisible}
+                        handleCloseVTOModal={handleCloseVTOModal}
+                        isVTOModalVisible={isVTOModalVisible}
                         selectedProduct={selectedProduct}
                     />
                 </>

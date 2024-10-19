@@ -101,7 +101,7 @@ const OrderManagement = () => {
                             <select
                                 value={selectedStatus}
                                 onChange={handleStatusChange}
-                                className="border rounded-md px-3 py-3 focus:outline-none focus:ring focus:ring-blue-500 text-md"
+                                className="border rounded-md px-3 py-3 focus:outline-none focus:ring focus:ring-blue-500 text-md  text-gray-500"
                             >
                                 <option value="">Status</option>
                                 <option value="paid">Paid</option>
@@ -113,7 +113,7 @@ const OrderManagement = () => {
                             <select
                                 value={selectedDateFilter}
                                 onChange={handleDateFilterChange}
-                                className="border rounded-md px-3 py-3 focus:outline-none focus:ring focus:ring-blue-500 text-md"
+                                className="border rounded-md px-3 py-3 focus:outline-none focus:ring focus:ring-blue-500 text-md text-gray-500"
                             >
                                 <option value="">Order Dates</option>
                                 <option value="new">New</option>
