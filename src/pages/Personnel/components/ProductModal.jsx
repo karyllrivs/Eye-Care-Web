@@ -223,9 +223,12 @@ const ProductModal = ({ handleCloseModal, isModalVisible, selectedProduct }) => 
                                 onChange={handleChange}
                                 value={category_id}
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2" >
-                                {categories.map((category) => (
-                                    <option key={category._id} value={category._id}>{category.name}</option>
-                                ))}
+                                <option value="">Select category</option>
+                                {categories
+            .filter(category => category.name !== "Eye Glasses") // Filter out "Eye Glasses"
+            .map((category) => (
+                <option key={category._id} value={category._id}>{category.name}</option>
+            ))}
                             </select>
                         </div>
 
