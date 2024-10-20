@@ -130,9 +130,14 @@ const Analytics = () => {
 
     return (
         <div className="px-16 py-8">
-            <h1 className="text-5xl font-bold">
-  Analytics {new Date().getFullYear()}
-</h1>
+            <h1 className="text-5xl font-bold">Analytics</h1>
+
+            <div className="my-10">
+                <button onClick={() => setTimeFilter("monthly")} className={`px-4 py-2 mr-2 rounded ${timeFilter === "monthly" ? "bg-blue-500 text-white" : "bg-gray-200"}`}>Monthly</button>
+                <button onClick={() => setTimeFilter("6months")} className={`px-4 py-2 mr-2 rounded ${timeFilter === "6months" ? "bg-blue-500 text-white" : "bg-gray-200"}`}>6 Months</button>
+                <button onClick={() => setTimeFilter("annual")} className={`px-4 py-2 mr-2 rounded ${timeFilter === "annual" ? "bg-blue-500 text-white" : "bg-gray-200"}`}>Annual</button>
+                <button onClick={() => setTimeFilter("all")} className={`px-4 py-2 rounded ${timeFilter === "all" ? "bg-blue-500 text-white" : "bg-gray-200"}`}>All Time</button>
+            </div>
 
             <div ref={divRef}>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6 my-10">
