@@ -39,7 +39,6 @@ const Analytics = () => {
 
     const { totalSalesAmount, customerTotal, orderTotal, patientTotal, customers, sales, patients } = analytics;
 
-    // Function to filter data based on the selected time filter
     const filterDataByTime = (data) => {
         const currentDate = new Date();
         let filteredData;
@@ -48,15 +47,15 @@ const Analytics = () => {
             case "daily":
                 filteredData = data.filter(item => {
                     const itemDate = new Date(item.date);
-                    return itemDate.toDateString() === currentDate.toDateString(); // Compare dates only
+                    return itemDate.toDateString() === currentDate.toDateString();
                 });
                 break;
             case "weekly":
                 filteredData = data.filter(item => {
                     const itemDate = new Date(item.date);
                     const weekStart = new Date(currentDate);
-                    weekStart.setDate(currentDate.getDate() - currentDate.getDay()); // Get start of the week
-                    return itemDate >= weekStart && itemDate <= currentDate; // Current week filter
+                    weekStart.setDate(currentDate.getDate() - currentDate.getDay());
+                    return itemDate >= weekStart && itemDate <= currentDate;
                 });
                 break;
             case "monthly":
@@ -78,14 +77,13 @@ const Analytics = () => {
                     return itemDate.getFullYear() === currentDate.getFullYear();
                 });
                 break;
-            default: // "all"
-                filteredData = data; // No filtering
+            default: 
+                filteredData = data;
                 break;
         }
         return filteredData;
     };
 
-    // Apply filters to customers, sales, and patients
     const filteredCustomers = useMemo(() => filterDataByTime(customers), [customers, timeFilter]);
     const filteredSales = useMemo(() => filterDataByTime(sales), [sales, timeFilter]);
     const filteredPatients = useMemo(() => filterDataByTime(patients), [patients, timeFilter]);
@@ -105,7 +103,7 @@ const Analytics = () => {
                     backgroundColor: '#36A2EB',
                 },
             ],
-        }
+        };
     }, [filteredCustomers, filteredPatients]);
 
     const lineData = useMemo(() => {
@@ -121,12 +119,13 @@ const Analytics = () => {
         };
     }, [filteredSales]);
 
+    // Added divRef and handlePrint
     const divRef = useRef();
     const handlePrint = () => {
         const input = divRef.current;
         const title = "Analytics Reports";
         printPage(input, title);
-    }
+    };
 
     return (
         <div className="px-16 py-8">
@@ -177,6 +176,6 @@ const Analytics = () => {
             <PrintToPDFButton handlePrint={handlePrint} />
         </div>
     );
-}
+};
 
 export default Analytics;

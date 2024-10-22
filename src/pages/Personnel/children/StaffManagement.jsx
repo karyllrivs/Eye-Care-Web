@@ -5,7 +5,6 @@ import { AiOutlineSearch } from "react-icons/ai"; // Import the search icon
 import AccountModal from "../components/AccountModal";
 import PrintToPDFButton from "../components/PrintToPDFButton";
 import { printPage } from "../../../utils/printPage";
-import useTimeFrequencyFilter from "../components/TimeFrequencyFilter";
 
 const StaffManagement = () => {
     const [staffs, setStaffs] = useState([]);

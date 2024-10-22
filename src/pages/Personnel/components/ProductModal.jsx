@@ -11,16 +11,13 @@ const emptyFields = {
     description: "",
     price: "",
     stock: "",
-    brand: "", // Added brand field to emptyFields
 };
 
 const ProductModal = ({ handleCloseModal, isModalVisible, selectedProduct }) => {
     const [formFields, setFormFields] = useState(emptyFields);
     const [error, setError] = useState("");
     const [categories, setCategories] = useState([]);
-    
-    // Define the brands array
-    const brands = ["Dazzle", "Giordano", "Hangten"];
+    const [selectedImage, setSelectedImage] = useState(null);
 
     useEffect(() => {
         axiosClient
@@ -28,22 +25,18 @@ const ProductModal = ({ handleCloseModal, isModalVisible, selectedProduct }) => 
             .then(({ data }) => {
                 setCategories(data);
             })
-            .catch(
-                ({
-                    response: {
-                        data: { message },
-                    },
-                }) => {
-                    alert(message);
-                }
-            );
+            .catch(({ response: { data: { message } } }) => {
+                alert(message);
+            });
     }, []);
 
     useMemo(() => {
-        if (selectedProduct._id)
+        if (selectedProduct._id) {
             setFormFields(selectedProduct);
-        else
+            setSelectedImage(null); // Clear selected image when editing an existing product
+        } else {
             setFormFields(emptyFields);
+        }
     }, [selectedProduct]);
 
     const handleChange = (e) => {
@@ -66,101 +59,82 @@ const ProductModal = ({ handleCloseModal, isModalVisible, selectedProduct }) => 
     const handleSubmit = (e) => {
         e.preventDefault();
 
+        const formData = new FormData();
+        Object.keys(formFields).forEach((key) => {
+            formData.append(key, formFields[key]);
+        });
+
+        if (selectedImage) {
+            formData.append("image", selectedImage);
+        }
+
         if (formFields._id) {
             axiosClient
-                .put("/products/" + selectedProduct._id, formFields, {
+                .put("/products/" + selectedProduct._id, formData, {
                     headers: {
-                        'Content-Type': 'multipart/form-data',
+                        "Content-Type": "multipart/form-data",
                     },
                 })
                 .then(({ data: { message } }) => {
                     alert(message);
                     window.location.reload();
                 })
-                .catch(
-                    ({
-                        response: {
-                            data: { message },
-                        },
-                    }) => {
-                        setError(message);
-                    }
-                );
+                .catch(({ response: { data: { message } } }) => {
+                    setError(message);
+                });
         } else {
             axiosClient
-                .post("/products", formFields, {
+                .post("/products", formData, {
                     headers: {
-                        'Content-Type': 'multipart/form-data',
+                        "Content-Type": "multipart/form-data",
                     },
                 })
                 .then(({ data: { message } }) => {
                     alert(message);
                     window.location.reload();
                 })
-                .catch(
-                    ({
-                        response: {
-                            data: { message },
-                        },
-                    }) => {
-                        setError(message);
-                    }
-                );
+                .catch(({ response: { data: { message } } }) => {
+                    setError(message);
+                });
         }
     };
 
     const loadImage = (event) => {
-        let reader = new FileReader();
-        reader.onload = function () {
-            let output =
-                document.getElementById('ImagePreview');
-            output.src = reader.result;
-        };
-        reader.readAsDataURL(event.target.files[0]);
-        setFormFields({
-            ...formFields,
-            image: event.target.files[0]
-        });
+        const file = event.target.files[0];
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = function () {
+                const output = document.getElementById("ImagePreview");
+                output.src = reader.result;
+            };
+            reader.readAsDataURL(file);
+            setSelectedImage(file);
+        }
     };
 
     const deleteProduct = (id) => {
-        if (confirm("Are you sure you want to delete this product?"))
+        if (confirm("Are you sure you want to delete this product?")) {
             axiosClient
                 .delete("/products/" + id)
                 .then(({ data: { message } }) => {
                     alert(message);
                     window.location.reload();
                 })
-                .catch(
-                    ({
-                        response: {
-                            data: { message },
-                        },
-                    }) => {
-                        console.error(message);
-                    }
-                );
+                .catch(({ response: { data: { message } } }) => {
+                    console.error(message);
+                });
+        }
     };
 
     if (!isModalVisible) return null;
 
-    const {
-        _id,
-        category_id,
-        name,
-        image,
-        description,
-        price,
-        stock,
-        brand, // Added brand field
-    } = formFields;
+    const { _id, category_id, name, image, description, price, stock } = formFields;
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
             <form className="bg-white p-8 rounded-lg w-1/2 max-h-[90vh] overflow-y-auto" onSubmit={handleSubmit}>
                 <h2 className="text-lg font-semibold mb-4">{_id ? "Edit" : "Add"} Product:</h2>
                 <div className="space-y-4">
-
                     {error && <p className="text-red-500 text-sm">{error}</p>}
                     <div>
                         <label className="block text-sm font-semibold text-gray-700">
@@ -222,33 +196,15 @@ const ProductModal = ({ handleCloseModal, isModalVisible, selectedProduct }) => 
                                 name="category_id"
                                 onChange={handleChange}
                                 value={category_id}
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2" >
-                                <option value="">Select category</option>
-                                {categories
-            .filter(category => category.name !== "Eye Glasses") // Filter out "Eye Glasses"
-            .map((category) => (
-                <option key={category._id} value={category._id}>{category.name}</option>
-            ))}
-                            </select>
-                        </div>
-
-                        <div className="flex-1">
-                            <label className="block text-sm font-semibold text-gray-700">
-                                Brand
-                            </label>
-                            <select
-                                id="brand"
-                                name="brand"
-                                onChange={handleChange}
-                                value={brand} // Bind the brand field
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2">
-                                <option value="">Select a brand</option>
-                                {brands.map((brandName, index) => (
-                                    <option key={index} value={brandName}>{brandName}</option>
+                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
+                            >
+                                {categories.map((category) => (
+                                    <option key={category._id} value={category._id}>
+                                        {category.name}
+                                    </option>
                                 ))}
                             </select>
                         </div>
-
                         <div className="flex-1">
                             <label className="block text-sm font-semibold text-gray-700">
                                 Thumbnails
@@ -272,23 +228,21 @@ const ProductModal = ({ handleCloseModal, isModalVisible, selectedProduct }) => 
                     </div>
                 </div>
                 <div className="mt-6 flex justify-end">
-                    <button
-                        className="text-white bg-green-500 hover:bg-green-600  px-9 py-2 rounded"
-                    >
+                    <button className="text-white bg-green-500 hover:bg-green-600 px-9 py-2 rounded">
                         Save
                     </button>
-                    {selectedProduct._id ?
+                    {_id ? (
                         <button
                             type="button"
-                            onClick={() => deleteProduct(selectedProduct._id)}
+                            onClick={() => deleteProduct(_id)}
                             className="text-white bg-red-500 hover:bg-red-600 px-9 py-2 rounded ml-2"
                         >
                             Delete
-                        </button> : null
-                    }
+                        </button>
+                    ) : null}
                     <button
                         type="button"
-                        className="text-white bg-blue-500 hover:bg-blue-600  px-9 py-2 rounded ml-2"
+                        className="text-white bg-blue-500 hover:bg-blue-600 px-9 py-2 rounded ml-2"
                         onClick={handleCloseModal}
                     >
                         Close
