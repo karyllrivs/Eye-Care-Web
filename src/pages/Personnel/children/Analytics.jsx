@@ -131,18 +131,24 @@ const Analytics = () => {
         <div className="px-16 py-8">
             <h1 className="text-5xl font-bold">Analytics</h1>
 
-            <div className="my-10">
-                <button onClick={() => setTimeFilter("monthly")} className={`px-4 py-2 mr-2 rounded ${timeFilter === "monthly" ? "bg-blue-500 text-white" : "bg-gray-200"}`}>Monthly</button>
-                <button onClick={() => setTimeFilter("6months")} className={`px-4 py-2 mr-2 rounded ${timeFilter === "6months" ? "bg-blue-500 text-white" : "bg-gray-200"}`}>6 Months</button>
-                <button onClick={() => setTimeFilter("annual")} className={`px-4 py-2 mr-2 rounded ${timeFilter === "annual" ? "bg-blue-500 text-white" : "bg-gray-200"}`}>Annual</button>
-                <button onClick={() => setTimeFilter("all")} className={`px-4 py-2 rounded ${timeFilter === "all" ? "bg-blue-500 text-white" : "bg-gray-200"}`}>All Time</button>
+            {/* Updated Filter Row */}
+            <div className="my-10 flex items-center">
+                <div className="flex space-x-2">
+                    <button onClick={() => setTimeFilter("monthly")} className={`px-4 py-2 rounded ${timeFilter === "monthly" ? "bg-blue-500 text-white" : "bg-gray-200"}`}>Monthly</button>
+                    <button onClick={() => setTimeFilter("6months")} className={`px-4 py-2 rounded ${timeFilter === "6months" ? "bg-blue-500 text-white" : "bg-gray-200"}`}>6 Months</button>
+                    <button onClick={() => setTimeFilter("annual")} className={`px-4 py-2 rounded ${timeFilter === "annual" ? "bg-blue-500 text-white" : "bg-gray-200"}`}>Annual</button>
+                    <button onClick={() => setTimeFilter("all")} className={`px-4 py-2 rounded ${timeFilter === "all" ? "bg-blue-500 text-white" : "bg-gray-200"}`}>All Time</button>
+                </div>
+                <div className="ml-auto">
+                    <PrintToPDFButton handlePrint={handlePrint} />
+                </div>
             </div>
 
             <div ref={divRef}>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6 my-10">
                     <div className="bg-blue-100 p-4 rounded">
                         <h2 className="text-xl font-semibold mb-2">Total Sales</h2>
-                        <p className="text-2xl font-bold">₱{totalSalesAmount}</p>
+                        <p className="text-2xl font-bold">₱{totalSalesAmount.toFixed(2)}</p>
                     </div>
 
                     <div className="bg-green-100 p-4 rounded">
@@ -173,7 +179,6 @@ const Analytics = () => {
                     </div>
                 </div>
             </div>
-            <PrintToPDFButton handlePrint={handlePrint} />
         </div>
     );
 };
