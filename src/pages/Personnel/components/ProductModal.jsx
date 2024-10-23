@@ -11,7 +11,10 @@ const emptyFields = {
     description: "",
     price: "",
     stock: "",
+    brand: "", // New brand field
 };
+
+const brands = ["Dazzle", "Giordano", "Hangten"]; // Brand options
 
 const ProductModal = ({ handleCloseModal, isModalVisible, selectedProduct }) => {
     const [formFields, setFormFields] = useState(emptyFields);
@@ -128,7 +131,7 @@ const ProductModal = ({ handleCloseModal, isModalVisible, selectedProduct }) => 
 
     if (!isModalVisible) return null;
 
-    const { _id, category_id, name, image, description, price, stock } = formFields;
+    const { _id, category_id, name, image, description, price, stock, brand } = formFields; // Include brand field
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
@@ -205,6 +208,26 @@ const ProductModal = ({ handleCloseModal, isModalVisible, selectedProduct }) => 
                                 ))}
                             </select>
                         </div>
+                        <div className="flex-1">
+                            <label className="block text-sm font-semibold text-gray-700">
+                                Brand
+                            </label>
+                            <select
+                                name="brand"
+                                value={brand}
+                                onChange={handleChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
+                            >
+                                <option value="">Select a Brand</option>
+                                {brands.map((brandOption, index) => (
+                                    <option key={index} value={brandOption}>
+                                        {brandOption}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                    <div className="flex space-x-4">
                         <div className="flex-1">
                             <label className="block text-sm font-semibold text-gray-700">
                                 Thumbnails

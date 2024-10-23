@@ -156,10 +156,6 @@ const AccountManagement = () => {
                             </table>
                         </div>
                     </div>
-
-                    <div className="flex justify-between">
-                        <PrintToPDFButton handlePrint={handlePrint} />
-                    </div>
                 </>
             )}
 

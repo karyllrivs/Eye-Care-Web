@@ -7,6 +7,8 @@ import { printPage } from "../../../utils/printPage";
 import PrintToPDFButton from "../components/PrintToPDFButton";
 import useFilterSearch from "../components/FilterSearch";
 
+const brands = ["All Brands", "Dazzle", "Giordano", "Hangten"]; // List of brands
+
 const InventoryManagement = () => {
     const [products, setProducts] = useState([]);
 
@@ -15,6 +17,8 @@ const InventoryManagement = () => {
 
     const [categories, setCategories] = useState([]); // State to store categories
     const [selectedCategory, setSelectedCategory] = useState("All Categories"); // State to manage selected category
+
+    const [selectedBrand, setSelectedBrand] = useState("All Brands"); // State to manage selected brand
 
     /** PRODUCT MODAL */
     const [selectedProduct, setSelectedProduct] = useState({});
@@ -71,11 +75,13 @@ const InventoryManagement = () => {
         printPage(input, title);
     };
 
-    // Filter products based on the selected category
-    const filteredByCategory =
-        selectedCategory === "All Categories"
-            ? filteredData
-            : filteredData.filter((product) => product.category_name === selectedCategory);
+    // Filter products based on the selected category and brand
+    const filteredByCategoryAndBrand = filteredData.filter((product) => {
+        const matchesCategory =
+            selectedCategory === "All Categories" || product.category_name === selectedCategory;
+        const matchesBrand = selectedBrand === "All Brands" || product.brand === selectedBrand;
+        return matchesCategory && matchesBrand;
+    });
 
     return (
         <div className="px-16 py-8">
@@ -114,6 +120,23 @@ const InventoryManagement = () => {
                                 </select>
                             </div>
 
+                            {/* Brand Selection */}
+                            <div className="flex items-center ml-0"> {/* Add some margin to separate from category */}
+                                <select
+                                    id="brand-select"
+                                    value={selectedBrand}
+                                    onChange={(e) => setSelectedBrand(e.target.value)}
+                                    className="p-2 border px-3 border-gray-300 rounded-lg bg-white text-gray-600 text-sm"
+                                    style={{ height: '46px' }}  // Adjusting height to match the search bar
+                                >
+                                    {brands.map((brand, index) => (
+                                        <option key={index} value={brand}>
+                                            {brand}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
                             <div className="ml-auto">
                                 <PrintToPDFButton handlePrint={handlePrint} />
                             </div>
@@ -126,6 +149,7 @@ const InventoryManagement = () => {
                                         <th scope="col" className="px-6 py-3">Image</th>
                                         <th scope="col" className="px-6 py-3">Name</th>
                                         <th scope="col" className="px-6 py-3">Category</th>
+                                        <th scope="col" className="px-6 py-3">Brand</th> {/* Add this new column */}
                                         <th scope="col" className="px-6 py-3">Description</th>
                                         <th scope="col" className="px-6 py-3">Price</th>
                                         <th scope="col" className="px-6 py-3">Stock</th>
@@ -133,13 +157,14 @@ const InventoryManagement = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredByCategory.map((product, index) => (
+                                    {filteredByCategoryAndBrand.map((product, index) => (
                                         <tr key={index} className="bg-white  dark:border-gray-700">
                                             <td className="px-6 py-4">
                                                 <img className="h-28 w-28 mr-4" src={getFile(product.image)} alt="" />
                                             </td>
                                             <td className="px-6 py-4">{product.name}</td>
                                             <td className="px-6 py-4">{product.category_name}</td>
+                                            <td className="px-6 py-4">{product.brand}</td> {/* Display brand */}
                                             <td className="px-6 py-4">{product.description}</td>
                                             <td className="px-6 py-4">₱{product.price}</td>
                                             <td className="px-6 py-4">{product.stock}</td>
