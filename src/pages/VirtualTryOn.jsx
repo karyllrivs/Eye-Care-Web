@@ -134,7 +134,7 @@ const VirtualTryOn = () => {
 
                 // Glasses scaling and offset values
                 const scaleX = -0.01;   // left of right sensitivity
-                const scaleY = -0.01;   // glass height
+                const scaleY = -0.015;   // glass height in the eyes
                 const offsetX = 0.00;
                 const offsetY = -0.01;
 
