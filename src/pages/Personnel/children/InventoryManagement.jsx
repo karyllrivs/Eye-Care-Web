@@ -7,7 +7,7 @@ import { printPage } from "../../../utils/printPage";
 import PrintToPDFButton from "../components/PrintToPDFButton";
 import useFilterSearch from "../components/FilterSearch";
 
-const brands = ["All Brands", "Dazzle", "Giordano", "Hangten"]; // List of brands
+const brands = ["All Brands", "Dazzle", "Giordano", "Hangten", "Others"]; // List of brands
 
 const InventoryManagement = () => {
     const [products, setProducts] = useState([]);

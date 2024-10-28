@@ -14,7 +14,7 @@ const emptyFields = {
     brand: "", // New brand field
 };
 
-const brands = ["Dazzle", "Giordano", "Hangten"]; // Brand options
+const brands = ["Dazzle", "Giordano", "Hangten", "Others"]; // Brand options
 
 const ProductModal = ({ handleCloseModal, isModalVisible, selectedProduct }) => {
     const [formFields, setFormFields] = useState(emptyFields);
