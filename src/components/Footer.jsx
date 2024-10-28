@@ -47,11 +47,6 @@ const Footer = () => {
                 Store
               </h2>
               <ul className="text-[#253D4E]">
-                <li className="mb-4">
-                  <a href="#footer" className="hover:underline">
-                    About Us
-                  </a>
-                </li>
                 <li>
                   <a href="#footer" className="hover:underline">
                     Contact Us

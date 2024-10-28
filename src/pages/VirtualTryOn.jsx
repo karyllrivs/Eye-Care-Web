@@ -179,17 +179,17 @@ const VirtualTryOn = () => {
                     )}
                     <div className="w-[400px] h-[400px] sm:w-full sm:h-full">
                         <Webcam 
-    ref={webcamRef} 
-    autoPlay 
-    playsInline 
-    style={{ width: '100%', height: '100%' }} 
-    mirrored={true} 
-  />
-<canvas 
-    ref={canvasRef} 
-    style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }} 
-  />
-</div>
+                            ref={webcamRef} 
+                            autoPlay 
+                            playsInline 
+                            style={{ width: '100%', height: '100%' }} 
+                            mirrored={true} 
+                        />
+                    <canvas 
+                        ref={canvasRef} 
+                        style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }} 
+                    />
+                    </div>
                 </div>
                 <div className='bg-teal-950 mb-14 w-1/3 mx-auto p-5 grid grid-rows-1 grid-flow-col grid-auto-cols-20 justify-center gap-3'>
                     {productModels.length > 0
