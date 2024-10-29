@@ -199,8 +199,8 @@ const ProductModal = ({ handleCloseModal, isModalVisible, selectedProduct }) => 
                                 name="category_id"
                                 onChange={handleChange}
                                 value={category_id}
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
-                            >
+                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2">
+                                <option value="">Select a Category</option>
                                 {categories.map((category) => (
                                     <option key={category._id} value={category._id}>
                                         {category.name}
