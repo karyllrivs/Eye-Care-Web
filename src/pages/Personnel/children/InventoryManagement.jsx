@@ -7,18 +7,14 @@ import { printPage } from "../../../utils/printPage";
 import PrintToPDFButton from "../components/PrintToPDFButton";
 import useFilterSearch from "../components/FilterSearch";
 
-const brands = ["All Brands", "Dazzle", "Giordano", "Hangten", "Others"]; // List of brands
-
 const InventoryManagement = () => {
     const [products, setProducts] = useState([]);
-
-    // Apply search filter on the items
+    const [selectedProductName, setSelectedProductName] = useState("All Products"); // State for selected product name
+   
     const [FilterSearch, filteredData] = useFilterSearch(products, ["name"]);
 
-    const [categories, setCategories] = useState([]); // State to store categories
-    const [selectedCategory, setSelectedCategory] = useState("All Categories"); // State to manage selected category
-
-    const [selectedBrand, setSelectedBrand] = useState("All Brands"); // State to manage selected brand
+    const [categories, setCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState("All Categories");
 
     /** PRODUCT MODAL */
     const [selectedProduct, setSelectedProduct] = useState({});
@@ -55,17 +51,11 @@ const InventoryManagement = () => {
                     "All Categories",
                     ...new Set(data.map((product) => product.category_name)),
                 ];
-                setCategories(uniqueCategories); // Set unique categories
+                setCategories(uniqueCategories);
             })
-            .catch(
-                ({
-                    response: {
-                        data: { message },
-                    },
-                }) => {
-                    alert(message);
-                }
-            );
+            .catch(({ response: { data: { message } } }) => {
+                alert(message);
+            });
     }, []);
 
     const divRef = useRef();
@@ -75,13 +65,15 @@ const InventoryManagement = () => {
         printPage(input, title);
     };
 
-    // Filter products based on the selected category and brand
-    const filteredByCategoryAndBrand = filteredData.filter((product) => {
-        const matchesCategory =
-            selectedCategory === "All Categories" || product.category_name === selectedCategory;
-        const matchesBrand = selectedBrand === "All Brands" || product.brand === selectedBrand;
-        return matchesCategory && matchesBrand;
+    // Filter products based on the selected category
+    const filteredByCategory = filteredData.filter((product) => {
+        return selectedCategory === "All Categories" || product.category_name === selectedCategory;
     });
+
+     // Filter products by the first word of their name
+     const filteredByProductName = selectedProductName === "All Products" 
+     ? filteredByCategory 
+     : filteredByCategory.filter((product) => product.name.split(" ")[0] === selectedProductName);
 
     return (
         <div className="px-16 py-8">
@@ -94,12 +86,12 @@ const InventoryManagement = () => {
                     Add Product
                 </button>
             </div>
-            {products.length == 0 ? (
+            {products.length === 0 ? (
                 <h2 className="text-2xl py-5">No data at the moment.</h2>
             ) : (
                 <>
                     <div className="my-10">
-                        <div className="flex gap-2 items-center"> {/* Aligning with search bar */}
+                        <div className="flex gap-2 items-center">
                             {/* Search Bar */}
                             {FilterSearch}
 
@@ -109,8 +101,8 @@ const InventoryManagement = () => {
                                     id="category-select"
                                     value={selectedCategory}
                                     onChange={(e) => setSelectedCategory(e.target.value)}
-                                    className="p-2 border border-gray-300 rounded-lg bg-white text-gray-600 text-sm"   // Adjust font style here
-                                    style={{ height: '46px' }}  // Adjusting height to match the search bar
+                                    className="p-2 border border-gray-300 rounded-lg bg-white text-gray-600 text-sm"
+                                    style={{ height: '46px' }}
                                 >
                                     {categories.map((category, index) => (
                                         <option key={index} value={category}>
@@ -120,22 +112,22 @@ const InventoryManagement = () => {
                                 </select>
                             </div>
 
-                            {/* Brand Selection */}
-                            <div className="flex items-center ml-0"> {/* Add some margin to separate from category */}
+                            {/* Product Name Selection */}
+                            <div className="flex items-center">
                                 <select
-                                    id="brand-select"
-                                    value={selectedBrand}
-                                    onChange={(e) => setSelectedBrand(e.target.value)}
-                                    className="p-2 border px-3 border-gray-300 rounded-lg bg-white text-gray-600 text-sm"
-                                    style={{ height: '46px' }}  // Adjusting height to match the search bar
+                                    id="product-name-select"
+                                    value={selectedProductName}
+                                    onChange={(e) => setSelectedProductName(e.target.value)}
+                                    className="p-2 border border-gray-300 rounded-lg bg-white text-gray-600 text-sm"
+                                    style={{ height: '46px' }}
                                 >
-                                    {brands.map((brand, index) => (
-                                        <option key={index} value={brand}>
-                                            {brand}
-                                        </option>
-                                    ))}
+                                    <option value="All Products">All Brands</option>
+                                    <option value="Dazzle">Dazzle</option>
+                                    <option value="Giordano">Giordano</option>
+                                    <option value="Hangten">Hangten</option>
                                 </select>
                             </div>
+
 
                             <div className="ml-auto">
                                 <PrintToPDFButton handlePrint={handlePrint} />
@@ -149,7 +141,6 @@ const InventoryManagement = () => {
                                         <th scope="col" className="px-6 py-3">Image</th>
                                         <th scope="col" className="px-6 py-3">Name</th>
                                         <th scope="col" className="px-6 py-3">Category</th>
-                                        <th scope="col" className="px-6 py-3">Brand</th> {/* Add this new column */}
                                         <th scope="col" className="px-6 py-3">Description</th>
                                         <th scope="col" className="px-6 py-3">Price</th>
                                         <th scope="col" className="px-6 py-3">Stock</th>
@@ -157,14 +148,13 @@ const InventoryManagement = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredByCategoryAndBrand.map((product, index) => (
-                                        <tr key={index} className="bg-white  dark:border-gray-700">
+                                    {filteredByProductName.map((product, index) => (
+                                        <tr key={index} className="bg-white dark:border-gray-700">
                                             <td className="px-6 py-4">
                                                 <img className="h-28 w-28 mr-4" src={getFile(product.image)} alt="" />
                                             </td>
                                             <td className="px-6 py-4">{product.name}</td>
                                             <td className="px-6 py-4">{product.category_name}</td>
-                                            <td className="px-6 py-4">{product.brand}</td> {/* Display brand */}
                                             <td className="px-6 py-4">{product.description}</td>
                                             <td className="px-6 py-4">₱{product.price}</td>
                                             <td className="px-6 py-4">{product.stock}</td>
